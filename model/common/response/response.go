@@ -1,21 +1,16 @@
 package response
 
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
-
 /**
- * @Author: 1999single
- * @Description:
+ * @Author: Quan
+ * @Description:	基本的返回信息封装类
+					是所有Response的基类，需要根据具体场景拓展才能使用
  * @File: response
  * @Version: 1.0.0
- * @Date: 2022/5/7 10:47
- */
-type Response struct {
-	Code int         `json:"code"`
-	Data interface{} `json:"data"`
-	Msg  string      `json:"msg"`
+ * @Date: 2022/5/8 20:50
+*/
+type BasicResponse struct {
+	Code int    `json:"status_code"`
+	Msg  string `json:"status_msg"`
 }
 
 const (
@@ -23,39 +18,34 @@ const (
 	SUCCESS = 0
 )
 
-func Result(code int, data interface{}, msg string, c *gin.Context) {
-	// 开始时间
-	c.JSON(http.StatusOK, Response{
-		code,
-		data,
-		msg,
-	})
+// 创建普通的响应成功
+func (BasicResponse) Success() BasicResponse {
+	return BasicResponse{
+		Code: SUCCESS,
+		Msg:  "",
+	}
 }
 
-func Ok(c *gin.Context) {
-	Result(SUCCESS, map[string]interface{}{}, "操作成功", c)
+// 创建普通响应失败
+func (BasicResponse) Fail() BasicResponse {
+	return BasicResponse{
+		Code: ERROR,
+		Msg:  "操作失败",
+	}
 }
 
-func OkWithMessage(message string, c *gin.Context) {
-	Result(SUCCESS, map[string]interface{}{}, message, c)
+// 创建带信息的响应成功
+func (BasicResponse) SuccessWithMsg(msg string) BasicResponse {
+	return BasicResponse{
+		Code: SUCCESS,
+		Msg:  msg,
+	}
 }
 
-func OkWithData(data interface{}, c *gin.Context) {
-	Result(SUCCESS, data, "操作成功", c)
-}
+func (BasicResponse) FailWithMsg(msg string) BasicResponse {
+	return BasicResponse{
+		Code: ERROR,
+		Msg:  msg,
+	}
 
-func OkWithDetailed(data interface{}, message string, c *gin.Context) {
-	Result(SUCCESS, data, message, c)
-}
-
-func Fail(c *gin.Context) {
-	Result(ERROR, map[string]interface{}{}, "操作失败", c)
-}
-
-func FailWithMessage(message string, c *gin.Context) {
-	Result(ERROR, map[string]interface{}{}, message, c)
-}
-
-func FailWithDetailed(data interface{}, message string, c *gin.Context) {
-	Result(ERROR, data, message, c)
 }
