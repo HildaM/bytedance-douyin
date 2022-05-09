@@ -1,51 +1,51 @@
 package response
 
-/**
- * @Author: Quan
- * @Description:	基本的返回信息封装类
-					是所有Response的基类，需要根据具体场景拓展才能使用
- * @File: response
- * @Version: 1.0.0
- * @Date: 2022/5/8 20:50
-*/
-type BasicResponse struct {
-	Code int    `json:"status_code"`
-	Msg  string `json:"status_msg"`
-}
-
-const (
-	ERROR   = 7
-	SUCCESS = 0
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-// 创建普通的响应成功
-func (BasicResponse) Success() BasicResponse {
-	return BasicResponse{
-		Code: SUCCESS,
-		Msg:  "",
-	}
+/**
+ * @Author: Charon
+ * @Description:
+ * @File: response
+ * @Version: 1.0.0
+ * @Date: 2022/5/9 12:52
+ */
+
+const (
+	ERROR           = 7
+	SUCCESS         = 0
+	SUCCESS_MESSAGE = "success"
+	ERROR_MESSAGE   = "error"
+)
+
+type BasicResponse struct {
+	StatusCode    int8   `json:"status_code"`
+	StatusMessage string `json:"status_msg"`
+	_             interface{}
 }
 
-// 创建普通响应失败
-func (BasicResponse) Fail() BasicResponse {
-	return BasicResponse{
-		Code: ERROR,
-		Msg:  "操作失败",
-	}
+func Ok(c *gin.Context) {
+	c.JSON(http.StatusOK, &BasicResponse{StatusCode: SUCCESS, StatusMessage: SUCCESS_MESSAGE})
 }
 
-// 创建带信息的响应成功
-func (BasicResponse) SuccessWithMsg(msg string) BasicResponse {
-	return BasicResponse{
-		Code: SUCCESS,
-		Msg:  msg,
-	}
+func OkWithMessage(c *gin.Context, message string) {
+	c.JSON(http.StatusOK, &BasicResponse{StatusCode: SUCCESS, StatusMessage: message})
 }
 
-func (BasicResponse) FailWithMsg(msg string) BasicResponse {
-	return BasicResponse{
-		Code: ERROR,
-		Msg:  msg,
-	}
+func OkWithData(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, &data)
+}
 
+func Fail(c *gin.Context) {
+	c.JSON(http.StatusOK, &BasicResponse{StatusCode: ERROR, StatusMessage: ERROR_MESSAGE})
+}
+
+func FailWithMessage(message string, c *gin.Context) {
+	c.JSON(http.StatusOK, &BasicResponse{StatusCode: ERROR, StatusMessage: message})
+}
+
+func FailWithData(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, &data)
 }
