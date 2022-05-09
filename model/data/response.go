@@ -23,9 +23,9 @@ const (
 )
 
 type BasicResponse struct {
-	StatusCode    int8   `json:"status_code"`
-	StatusMessage string `json:"status_msg"`
-	Data          interface{}
+	StatusCode    int8        `json:"status_code"`
+	StatusMessage string      `json:"status_msg"`
+	Data          interface{} `json:"-"`
 }
 
 func withDetailed(c *gin.Context, code int8, message string, data interface{}) {
