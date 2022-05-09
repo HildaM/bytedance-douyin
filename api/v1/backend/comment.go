@@ -1,6 +1,8 @@
 package backend
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 /**
  * @Author: 1999single
@@ -9,12 +11,12 @@ import "github.com/gin-gonic/gin"
  * @Version: 1.0.0
  * @Date: 2022/5/6 18:33
  */
-type CommentApi struct {}
+type CommentApi struct{}
 
-func (api *CommentApi) PostComment(c *gin.Context)  {
-
+func (api *CommentApi) PostComment(c *gin.Context) {
+	//response.UserInfoResponse{}
 }
 
-func (api *CommentApi) CommentList(c *gin.Context)  {
+func (api *CommentApi) CommentList(c *gin.Context) {
 
 }
