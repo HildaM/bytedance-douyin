@@ -56,7 +56,7 @@ func FailWithMessage(message string, c *gin.Context) {
 }
 
 func FailWithData(c *gin.Context, data interface{}) {
-	m, err := struct2Map(&BasicResponse{StatusCode: 0, StatusMessage: "success", Data: data})
+	m, err := struct2Map(&BasicResponse{StatusCode: ERROR, StatusMessage: ERROR_MESSAGE, Data: data})
 
 	if err != nil {
 		_ = fmt.Errorf("%w", err)
