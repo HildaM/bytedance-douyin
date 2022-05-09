@@ -15,7 +15,12 @@ import (
  */
 
 var (
-	GVA_LOG *zap.Logger
+	GVA_LOG    *zap.Logger
 	GVA_CONFIG config.Server
 	GVA_VP     *viper.Viper
+)
+
+// 数据库相关
+var (
+	MYSQL_URL string
 )
