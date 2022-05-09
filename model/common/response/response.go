@@ -21,7 +21,7 @@ const (
 )
 
 type BasicResponse struct {
-	StatusCode    int8   `json:"status_code"`
+	StatusCode    int8   `json:"status_code,int"`
 	StatusMessage string `json:"status_msg"`
 	_             interface{}
 }
