@@ -1,18 +1,16 @@
-package response
+package data
 
-type FeedResponse struct {
-	*BasicResponse
+type FeedData struct {
 	NextTime  int64    `json:"next_time"`
 	VideoList []*Video `json:"video_list"`
 }
 
-type PublishResponse struct {
-	*BasicResponse
+type PublishData struct {
 	VideoList []*Video `json:"video_list"`
 }
 
-type FavoriteResponse struct {
-	*PublishResponse
+type FavoriteData struct {
+	*PublishData
 }
 
 type Video struct {

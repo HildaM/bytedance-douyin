@@ -1,11 +1,11 @@
-package response
+package data
 
-type UserLoginOrRegisterResponse struct {
+type UserLoginOrRegisterData struct {
 	UserId int64  `json:"user_id"`
 	Token  string `json:"token"`
 }
 
-type UserInfoResponse struct {
+type UserInfoData struct {
 	User *UserInfo `json:"user"`
 }
 

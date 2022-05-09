@@ -1,4 +1,4 @@
-package response
+package data
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 /**
  * @Author: Charon
  * @Description:
- * @File: response
+ * @File: data
  * @Version: 1.0.0
  * @Date: 2022/5/9 12:52
  */
@@ -26,7 +26,6 @@ type BasicResponse struct {
 	StatusCode    int8   `json:"status_code"`
 	StatusMessage string `json:"status_msg"`
 	Data          interface{}
-	//_             interface{}
 }
 
 func Ok(c *gin.Context) {
@@ -88,21 +87,7 @@ func struct2Map(in interface{}) (map[string]interface{}, error) {
 		t := v.Type()
 		for i := 0; i < v.NumField(); i++ {
 			vi := v.Field(i)
-			//if vi.Kind() == reflect.Ptr { // 内嵌指针
-			//	vi = vi.Elem()
-			//	if vi.Kind() == reflect.Struct { // 结构体
-			//		queue = append(queue, vi.Interface())
-			//	} else {
-			//		ti := t.Field(i)
-			//		if tagValue := ti.Tag.Get("json"); tagValue != "" {
-			//			// 存入map
-			//			out[tagValue] = vi.Interface()
-			//		}
-			//	}
-			//	break
-			//}
-			//fmt.Println(vi.Kind())
-			if vi.Kind() == reflect.Interface { // 内嵌结构体
+			if vi.Kind() == reflect.Interface { // interface; data部分
 				queue = append(queue, vi.Interface())
 				break
 			}

@@ -1,7 +1,6 @@
-package response
+package data
 
-type CommentResponse struct {
-	*BasicResponse
+type CommentData struct {
 	CommentList []*Comment
 }
 

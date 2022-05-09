@@ -14,7 +14,7 @@ import (
 type CommentApi struct{}
 
 func (api *CommentApi) PostComment(c *gin.Context) {
-	//response.UserInfoResponse{}
+	//data.UserInfoResponse{}
 }
 
 func (api *CommentApi) CommentList(c *gin.Context) {
