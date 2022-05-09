@@ -1,9 +1,9 @@
 package data
 
 type FollowData struct {
-	UserList []*UserInfo `json:"user_list"`
+	UserList []*UserInfo `json:"user_list" binding:"required"`
 }
 
 type FollowerData struct {
-	*FollowData
+	UserList []*UserInfo `json:"user_list" binding:"required"`
 }
