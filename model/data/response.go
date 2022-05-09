@@ -28,6 +28,16 @@ type BasicResponse struct {
 	Data          interface{}
 }
 
+func withDetailed(c *gin.Context, code int8, message string, data interface{}) {
+	m, err := struct2Map(&BasicResponse{StatusCode: code, StatusMessage: message, Data: data})
+
+	if err != nil {
+		_ = fmt.Errorf("%w", err)
+	}
+
+	c.JSON(http.StatusOK, m)
+}
+
 func Ok(c *gin.Context) {
 	c.JSON(http.StatusOK, &BasicResponse{StatusCode: SUCCESS, StatusMessage: SUCCESS_MESSAGE})
 }
@@ -37,30 +47,27 @@ func OkWithMessage(c *gin.Context, message string) {
 }
 
 func OkWithData(c *gin.Context, data interface{}) {
-	m, err := struct2Map(&BasicResponse{StatusCode: 0, StatusMessage: "success", Data: data})
+	withDetailed(c, SUCCESS, SUCCESS_MESSAGE, data)
+}
 
-	if err != nil {
-		_ = fmt.Errorf("%w", err)
-	}
-
-	c.JSON(http.StatusOK, m)
+func OkWithDetailed(c *gin.Context, message string, data interface{}) {
+	withDetailed(c, SUCCESS, message, data)
 }
 
 func Fail(c *gin.Context) {
 	c.JSON(http.StatusOK, &BasicResponse{StatusCode: ERROR, StatusMessage: ERROR_MESSAGE})
 }
 
-func FailWithMessage(message string, c *gin.Context) {
+func FailWithMessage(c *gin.Context, message string) {
 	c.JSON(http.StatusOK, &BasicResponse{StatusCode: ERROR, StatusMessage: message})
 }
 
 func FailWithData(c *gin.Context, data interface{}) {
-	m, err := struct2Map(&BasicResponse{StatusCode: ERROR, StatusMessage: ERROR_MESSAGE, Data: data})
+	withDetailed(c, ERROR, ERROR_MESSAGE, data)
+}
 
-	if err != nil {
-		_ = fmt.Errorf("%w", err)
-	}
-	c.JSON(http.StatusOK, m)
+func FailWithDetailed(c *gin.Context, message string, data interface{}) {
+	withDetailed(c, ERROR, message, data)
 }
 
 func struct2Map(in interface{}) (map[string]interface{}, error) {
