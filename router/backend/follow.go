@@ -12,15 +12,15 @@ import (
  * @Version: 1.0.0
  * @Date: 2022/5/6 18:34
  */
-type FollowRouter struct {}
+type FollowRouter struct{}
 
-func (c *FollowRouter) InitFollowRouter(Router *gin.RouterGroup)  {
+func (c *FollowRouter) InitFollowRouter(Router *gin.RouterGroup) {
 	baseRouter := Router.Group("relation")
 	followRouter := baseRouter.Group("follow")
 	followerRouter := baseRouter.Group("follower")
 	followApi := v1.ApiGroupApp.BackendApiGroup.FollowApi
 	{
-		followRouter.POST("action", followApi.Follow)
+		baseRouter.POST("action", followApi.Follow)
 		followRouter.GET("list", followApi.FansList)
 	}
 	{
