@@ -31,8 +31,8 @@ func TestRedis(t *testing.T) {
 
 func initRedis2() (err error) {
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     "120.25.153.110:6379",
-		Password: "austin",
+		Addr:     "220.243.147.162:6379",
+		Password: "220429douyin",
 		DB:       0,
 		PoolSize: 100,
 	})

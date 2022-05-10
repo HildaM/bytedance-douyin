@@ -14,8 +14,21 @@ file:
   image-output: /home/charon/files/images/
 
 redis:
-  addr: '120.25.153.110'
+  addr: '220.243.147.162'
   port: '6379'
-  password: 'austin'
+  password: '220429douyin'
   db: '0'
   poolsize: '100'
+
+
+mysql:
+  path: '220.243.147.162'
+  port: '3306'
+  config: 'charset=utf8mb4&parseTime=True'
+  db-name: 'douyin'
+  username: 'root'
+  password: '220429douyin'
+  max-idle-conns: 10
+  max-open-conns: 100
+  log-mode: ""
+  log-zap: false
