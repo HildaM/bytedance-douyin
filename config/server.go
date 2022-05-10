@@ -1,7 +1,5 @@
 package config
 
-
-
 /**
  * @Author: 1999single
  * @Description: 应用配置
@@ -11,6 +9,6 @@ package config
  */
 
 type Server struct {
-	Zap Zap `mapstructure:"zap" json:"zap" yaml:"zap"`
-
+	Zap  Zap  `mapstructure:"zap" json:"zap" yaml:"zap"`
+	File File `mapstructure:"file" json:"file" yaml:"file"`
 }
