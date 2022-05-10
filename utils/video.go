@@ -6,6 +6,8 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"io"
 	"os"
+	"strconv"
+	"time"
 )
 
 // ReadFrameAsJpeg use ffmpeg read first frame of video as a jpeg
@@ -23,7 +25,8 @@ func ReadFrameAsJpeg(inFileName string) io.Reader {
 	return buf
 }
 
-// GenerateFilename depend on some algorithm to generate a name for uploaded videos
-func GenerateFilename(filename string) string {
-	return filename
+// GenerateFilename depend on timestamp, username and user id to generate a filename for uploaded videos
+func GenerateFilename(username string, userId int64) string {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	return timestamp + "_" + username + "_" + strconv.FormatInt(userId, 10)
 }

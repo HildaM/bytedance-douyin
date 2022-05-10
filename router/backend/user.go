@@ -13,18 +13,18 @@ import (
  * @Date: 2022/5/6 17:34
  */
 
-type UserRouter struct {}
+type UserRouter struct{}
 
-func (u *UserRouter) InitBaseUserRouter(Router *gin.RouterGroup)  {
+func (u *UserRouter) InitBaseUserRouter(Router *gin.RouterGroup) {
 	baseUserRouter := Router.Group("user")
 	userApi := v1.ApiGroupApp.BackendApiGroup.UserApi
 	{
 		baseUserRouter.POST("login", userApi.Login)
-		baseUserRouter.POST("register", userApi.Register)
+		baseUserRouter.POST("register/", userApi.Register)
 	}
 }
 
-func (u *UserRouter) InitUserInfoRouter(Router *gin.RouterGroup)  {
+func (u *UserRouter) InitUserInfoRouter(Router *gin.RouterGroup) {
 	baseUserRouter := Router.Group("user")
 	userApi := v1.ApiGroupApp.BackendApiGroup.UserApi
 	{
