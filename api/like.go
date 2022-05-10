@@ -1,4 +1,4 @@
-package backend
+package api
 
 import "github.com/gin-gonic/gin"
 
@@ -9,12 +9,12 @@ import "github.com/gin-gonic/gin"
  * @Version: 1.0.0
  * @Date: 2022/5/6 18:35
  */
-type LikeApi struct {}
+type LikeApi struct{}
 
-func (api *LikeApi) Like(c *gin.Context)  {
+func (api *LikeApi) Like(c *gin.Context) {
 
 }
 
-func (api *LikeApi) LikeList(c *gin.Context)  {
+func (api *LikeApi) LikeList(c *gin.Context) {
 
 }

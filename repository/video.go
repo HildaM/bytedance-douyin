@@ -4,7 +4,9 @@
 
 package repository
 
-import "bytedance-douyin/model/data"
+import (
+	"bytedance-douyin/api/data"
+)
 
 type Video struct {
 	Id            int64       `gorm:"column:id"`

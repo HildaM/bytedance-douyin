@@ -18,7 +18,7 @@ import (
 func Routers() *gin.Engine {
 	Router := gin.Default()
 
-	backendRouter := router.RouterGroupApp.Backend
+	router := router.GroupApp
 	// 如果想要不使用nginx代理前端网页，可以修改 web/.env.production 下的
 	// VUE_APP_BASE_API = /
 	// VUE_APP_BASE_PATH = http://localhost
@@ -38,18 +38,18 @@ func Routers() *gin.Engine {
 	PublicGroup := Router.Group("douyin")
 	{
 		// 不做鉴权
-		backendRouter.InitBaseUserRouter(PublicGroup) // 注册、登录
-		backendRouter.InitVideoFeedRouter(PublicGroup) // 视频流
+		router.InitBaseUserRouter(PublicGroup)  // 注册、登录
+		router.InitVideoFeedRouter(PublicGroup) // 视频流
 	}
 	PrivateGroup := Router.Group("douyin")
 	PrivateGroup.Use(middleware.JWTAuth()) //.Use(middleware.CasbinHandler())
 	{
 		// 鉴权
-		backendRouter.InitUserInfoRouter(PrivateGroup)    // 查看用户信息
-		backendRouter.InitVideoRouter(PrivateGroup)
-		backendRouter.InitCommentRouter(PrivateGroup)
-		backendRouter.InitFollowRouter(PrivateGroup)
-		backendRouter.InitLikeRouter(PrivateGroup)
+		router.InitUserInfoRouter(PrivateGroup) // 查看用户信息
+		router.InitVideoRouter(PrivateGroup)
+		router.InitCommentRouter(PrivateGroup)
+		router.InitFollowRouter(PrivateGroup)
+		router.InitLikeRouter(PrivateGroup)
 	}
 
 	// InstallPlugin(PublicGroup, PrivateGroup) // 安装插件
@@ -57,4 +57,3 @@ func Routers() *gin.Engine {
 	global.GVA_LOG.Info("router register success")
 	return Router
 }
-

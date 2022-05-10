@@ -1,7 +1,7 @@
-package backend
+package router
 
 import (
-	v1 "bytedance-douyin/api/v1"
+	"bytedance-douyin/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,11 +12,11 @@ import (
  * @Version: 1.0.0
  * @Date: 2022/5/6 18:35
  */
-type LikeRouter struct {}
+type LikeRouter struct{}
 
-func (l *LikeRouter) InitLikeRouter(Router *gin.RouterGroup)  {
+func (l *LikeRouter) InitLikeRouter(Router *gin.RouterGroup) {
 	router := Router.Group("favorite")
-	likeApi := v1.ApiGroupApp.BackendApiGroup.LikeApi
+	likeApi := api.GroupApp.LikeApi
 	{
 		router.POST("action", likeApi.Like)
 		router.GET("list", likeApi.LikeList)

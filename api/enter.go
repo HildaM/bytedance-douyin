@@ -1,4 +1,4 @@
-package backend
+package api
 
 import "bytedance-douyin/service"
 
@@ -7,9 +7,10 @@ import "bytedance-douyin/service"
  * @Description:
  * @File: enter
  * @Version: 1.0.0
- * @Date: 2022/5/6 17:56
+ * @Date: 2022/5/6 17:53
  */
-type ApiGroup struct {
+
+type Group struct {
 	UserApi
 	CommentApi
 	LikeApi
@@ -17,7 +18,9 @@ type ApiGroup struct {
 	VideoApi
 }
 
+var GroupApp = new(Group)
+
 // service
 var (
-	userService = service.ServiceGroupApp.BackendServiceGroup.UserService
+	userService = service.GroupApp.UserService
 )

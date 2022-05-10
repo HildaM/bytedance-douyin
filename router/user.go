@@ -1,7 +1,7 @@
-package backend
+package router
 
 import (
-	"bytedance-douyin/api/v1"
+	"bytedance-douyin/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +17,7 @@ type UserRouter struct{}
 
 func (u *UserRouter) InitBaseUserRouter(Router *gin.RouterGroup) {
 	baseUserRouter := Router.Group("user")
-	userApi := v1.ApiGroupApp.BackendApiGroup.UserApi
+	userApi := api.GroupApp.UserApi
 	{
 		baseUserRouter.POST("login", userApi.Login)
 		baseUserRouter.POST("register/", userApi.Register)
@@ -26,7 +26,7 @@ func (u *UserRouter) InitBaseUserRouter(Router *gin.RouterGroup) {
 
 func (u *UserRouter) InitUserInfoRouter(Router *gin.RouterGroup) {
 	baseUserRouter := Router.Group("user")
-	userApi := v1.ApiGroupApp.BackendApiGroup.UserApi
+	userApi := api.GroupApp.UserApi
 	{
 		baseUserRouter.GET("", userApi.UserInfo)
 	}

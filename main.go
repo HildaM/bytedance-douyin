@@ -12,11 +12,11 @@ import (
 //go:generate go mod download
 
 func main() {
-	global.GVA_VP = core.Viper()      // 初始化Viper
-	global.GVA_LOG = core.Zap()       // 初始化zap日志库
+	global.GVA_VP = core.Viper() // 初始化Viper
+	global.GVA_LOG = core.Zap()  // 初始化zap日志库
 	// zap.ReplaceGlobals(global.GVA_LOG)
 
-	initialize.Redis() // 初始化redis数据库
+	initialize.Redis()     // 初始化redis数据库
 	initialize.GormMysql() // 初始化mysql
 
 	core.RunWindowsServer()

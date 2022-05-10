@@ -1,7 +1,7 @@
-package backend
+package router
 
 import (
-	v1 "bytedance-douyin/api/v1"
+	"bytedance-douyin/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +18,7 @@ func (c *FollowRouter) InitFollowRouter(Router *gin.RouterGroup) {
 	baseRouter := Router.Group("relation")
 	followRouter := baseRouter.Group("follow")
 	followerRouter := baseRouter.Group("follower")
-	followApi := v1.ApiGroupApp.BackendApiGroup.FollowApi
+	followApi := api.GroupApp.FollowApi
 	{
 		// /relation/action
 		baseRouter.POST("action", followApi.Follow)

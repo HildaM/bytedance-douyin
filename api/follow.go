@@ -1,8 +1,8 @@
-package backend
+package api
 
 import (
-	r "bytedance-douyin/model/data"
-	"bytedance-douyin/model/request"
+	"bytedance-douyin/api/request"
+	r "bytedance-douyin/api/response"
 	"github.com/gin-gonic/gin"
 )
 

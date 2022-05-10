@@ -1,21 +1,16 @@
-package model
+package bo
 
 /**
  * @Author: 1999single
  * @Description:
  * @File: user
  * @Version: 1.0.0
- * @Date: 2022/5/10 23:30
+ * @Date: 2022/5/11 1:14
  */
 type User struct {
-	Base
+	ID            int64
 	Name          string
-	Password      string
 	FollowCount   int
 	FollowerCount int
-}
-
-// 表名
-func (User) TableName() string {
-	return "t_user"
+	Follow        bool
 }

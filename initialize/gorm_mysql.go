@@ -9,7 +9,7 @@ import (
 func GormMysql() {
 	m := global.GVA_CONFIG.Mysql
 	mysqlConfig := mysql.Config{
-		DSN: m.Dsn(),
+		DSN:                       m.Dsn(),
 		SkipInitializeWithVersion: false,
 	}
 	if gormMysql, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{}); err == nil {

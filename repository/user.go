@@ -1,4 +1,4 @@
-package backend
+package repository
 
 import (
 	"bytedance-douyin/global"
@@ -12,7 +12,7 @@ import (
  * @Version: 1.0.0
  * @Date: 2022/5/11 0:37
  */
-type UserDao struct {}
+type UserDao struct{}
 
 func (userDao *UserDao) GetUser(userId int) (model.User, error) {
 	user := model.User{}

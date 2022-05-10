@@ -1,7 +1,7 @@
-package backend
+package router
 
 import (
-	v1 "bytedance-douyin/api/v1"
+	"bytedance-douyin/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ type VideoRouter struct{}
 
 func (v *VideoRouter) InitVideoFeedRouter(Router *gin.RouterGroup) {
 	router := Router.Group("feed")
-	videoApi := v1.ApiGroupApp.BackendApiGroup.VideoApi
+	videoApi := api.GroupApp.VideoApi
 	{
 		router.GET("", videoApi.VideoFeed)
 	}
@@ -24,7 +24,7 @@ func (v *VideoRouter) InitVideoFeedRouter(Router *gin.RouterGroup) {
 
 func (v *VideoRouter) InitVideoRouter(Router *gin.RouterGroup) {
 	router := Router.Group("publish")
-	videoApi := v1.ApiGroupApp.BackendApiGroup.VideoApi
+	videoApi := api.GroupApp.VideoApi
 	{
 		router.POST("action/", videoApi.PostVideo)
 		router.GET("list", videoApi.VideoList)
