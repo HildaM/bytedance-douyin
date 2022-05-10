@@ -2,6 +2,7 @@ package global
 
 import (
 	"bytedance-douyin/config"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
@@ -22,5 +23,6 @@ var (
 
 // 数据库相关
 var (
+	REDIS     *redis.Client
 	MYSQL_URL string
 )

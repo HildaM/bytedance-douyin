@@ -9,6 +9,7 @@ package config
  */
 
 type Server struct {
-	Zap  Zap  `mapstructure:"zap" json:"zap" yaml:"zap"`
-	File File `mapstructure:"file" json:"file" yaml:"file"`
+	Zap   Zap   `mapstructure:"zap" json:"zap" yaml:"zap"`
+	File  File  `mapstructure:"file" json:"file" yaml:"file"`
+	Redis Redis `mapstructure:"redis" json:"redis" yaml:"redis"`
 }

@@ -8,8 +8,7 @@ import (
 	"os"
 )
 
-// use ffmpeg read first frame of video as a jpeg
-
+// ReadFrameAsJpeg use ffmpeg read first frame of video as a jpeg
 func ReadFrameAsJpeg(inFileName string) io.Reader {
 	frameNum := 1
 	buf := bytes.NewBuffer(nil)
@@ -24,8 +23,7 @@ func ReadFrameAsJpeg(inFileName string) io.Reader {
 	return buf
 }
 
-// depend on some algorithm to generate a name for uploaded videos
-
+// GenerateFilename depend on some algorithm to generate a name for uploaded videos
 func GenerateFilename(filename string) string {
 	return filename
 }

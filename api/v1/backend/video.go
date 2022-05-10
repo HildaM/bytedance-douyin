@@ -30,10 +30,12 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	videoName := utils.GenerateFilename(file.Filename)
 	fn := path + videoName
 
+	// 上传file文件到指定的文件路径fn
 	if err := c.SaveUploadedFile(file, fn); err != nil {
 		r.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 
+	// 读取视频文件的第一帧作为视频封面
 	reader := utils.ReadFrameAsJpeg(fn)
 	img, err := imaging.Decode(reader)
 	if err != nil {

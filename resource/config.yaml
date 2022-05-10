@@ -12,3 +12,10 @@ zap:
 file:
   video-output: /home/charon/files/videos/
   image-output: /home/charon/files/images/
+
+redis:
+  addr: '120.25.153.110'
+  port: '6379'
+  password: 'austin'
+  db: '0'
+  poolsize: '100'
