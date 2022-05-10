@@ -12,3 +12,10 @@ zap:
 file:
   video-output: /home/files/videos/
   image-output: /home/files/images/
+
+redis:
+  addr: '120.25.153.110'
+  port: '6379'
+  password: 'austin'
+  db: '0'
+  poolsize: '100'
