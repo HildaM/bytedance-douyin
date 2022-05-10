@@ -10,5 +10,5 @@ zap:
   log-in-console: true
 
 file:
-  video-output: /home/charon/files/videos/
-  image-output: /home/charon/files/images/
+  video-output: /home/files/videos/
+  image-output: /home/files/images/

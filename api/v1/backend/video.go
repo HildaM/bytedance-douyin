@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 /**
@@ -50,8 +51,13 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	r.OkWithMessage(c, "上传成功")
 }
 
+// 视频流接口
 func (api *VideoApi) VideoFeed(c *gin.Context) {
-
+	videoList := make([]*r.Video, 1, 1)
+	user := r.Author{Id: 1, Name: "charon", FollowCount: 0, FollowerCount: 1, IsFollow: false}
+	videoList[0] = &r.Video{Id: 1, Author: &user, PlayUrl: "http://220.243.147.162:8080/videos/sss.mp4", CoverUrl: "http://220.243.147.162:8080/images/1.jpg", FavoriteCount: 0, CommentCount: 0, IsFavorite: false}
+	data := r.FeedData{NextTime: time.Now().Unix(), VideoList: videoList}
+	r.OkWithData(c, data)
 }
 
 func (api *VideoApi) VideoList(c *gin.Context) {
