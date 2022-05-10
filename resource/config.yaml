@@ -14,8 +14,8 @@ file:
   image-output: /home/charon/files/images/
 
 redis:
-  addr: '120.25.153.110'
+  addr: ''
   port: '6379'
-  password: 'austin'
+  password: ''
   db: '0'
   poolsize: '100'
