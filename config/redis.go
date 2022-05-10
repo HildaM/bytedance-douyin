@@ -1,3 +1,7 @@
+// Package config
+// @Description: Redis配置信息
+// @Author: Quan
+
 package config
 
 type Redis struct {
