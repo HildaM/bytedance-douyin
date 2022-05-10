@@ -4,6 +4,7 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/initialize"
 	"go.uber.org/zap"
+	"net/http"
 	"time"
 )
 
@@ -22,6 +23,9 @@ func RunWindowsServer() {
 
 	Router := initialize.Routers()
 	Router.Static("/form-generator", "./resource/page")
+
+	Router.StaticFS("/videos", http.Dir(global.GVA_CONFIG.File.VideoOutput))
+	Router.StaticFS("/images", http.Dir(global.GVA_CONFIG.File.ImageOutput))
 
 	// address := fmt.Sprintf(":%d", global.GVA_CONFIG.System.Addr)
 	s := initServer("0.0.0.0:8080", Router)
