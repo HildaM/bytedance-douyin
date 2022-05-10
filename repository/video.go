@@ -1,8 +1,8 @@
-// Package dao
+// Package repository
 // @Description: Video Dao接口
 // @Author: Quan
 
-package dao
+package repository
 
 import "bytedance-douyin/model/data"
 

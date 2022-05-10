@@ -1,5 +1,7 @@
 package backend
 
+import "bytedance-douyin/service"
+
 /**
  * @Author: 1999single
  * @Description:
@@ -14,3 +16,8 @@ type ApiGroup struct {
 	FollowApi
 	VideoApi
 }
+
+// service
+var (
+	userService = service.ServiceGroupApp.BackendServiceGroup.UserService
+)
