@@ -7,15 +7,15 @@ package model
  * @Version: 1.0.0
  * @Date: 2022/5/10 23:30
  */
-type User struct {
+type UserDao struct {
 	Base
-	Name          string
-	Password      string
-	FollowCount   int
-	FollowerCount int
+	Name          string `gorm:"type:varchar(32)"`
+	Password      string `gorm:"type:varchar(32)"`
+	FollowCount   int64
+	FollowerCount int64
 }
 
 // 表名
-func (User) TableName() string {
+func (UserDao) TableName() string {
 	return "t_user"
 }

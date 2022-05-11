@@ -18,7 +18,7 @@ type Group struct {
 	VideoApi
 }
 
-var GroupApp = new(Group)
+var GroupApp Group
 
 // service
 var (

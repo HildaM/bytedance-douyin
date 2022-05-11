@@ -3,6 +3,8 @@ package repository
 import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
+	"bytedance-douyin/service/bo"
+	"fmt"
 )
 
 /**
@@ -14,10 +16,17 @@ import (
  */
 type UserDao struct{}
 
-func (userDao *UserDao) GetUser(userId int) (model.User, error) {
-	user := model.User{}
+func (UserDao) GetUser(userId int) (model.UserDao, error) {
+	user := model.UserDao{}
 	if result := global.GVA_DB.Where("id = ?", userId).First(&user); result.Error != nil {
 		return user, result.Error
 	}
 	return user, nil
+}
+
+func (UserDao) RegisterUser(userBo bo.UserBo) {
+	fmt.Println(userBo)
+	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
+	global.GVA_DB.Create(&user)
+	fmt.Printf("%+v", user)
 }

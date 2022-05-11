@@ -1,7 +1,7 @@
-package request
+package vo
 
 // 关注
-type FollowRequest struct {
+type FollowVo struct {
 	UserId     int64  `form:"user_id" binding:"required"`
 	Token      string `form:"token" binding:"required"`
 	ToUserId   string `form:"to_user_id" binding:"required"`
@@ -9,13 +9,21 @@ type FollowRequest struct {
 }
 
 // 关注列表
-type FollowListRequest struct {
+type FollowListVo struct {
 	UserId int64  `form:"user_id" binding:"required"`
 	Token  string `form:"token" binding:"required"`
 }
 
 // 粉丝列表
-type FollowerListRequest struct {
+type FollowerListVo struct {
 	UserId int64  `form:"user_id" binding:"required"`
 	Token  string `form:"token" binding:"required"`
+}
+
+type FollowResponseVo struct {
+	UserList []*UserInfo `json:"user_list" binding:"required"`
+}
+
+type FollowerResponseVo struct {
+	UserList []*UserInfo `json:"user_list" binding:"required"`
 }

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"bytedance-douyin/api/request"
 	r "bytedance-douyin/api/response"
+	"bytedance-douyin/api/vo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ import (
 type FollowApi struct{}
 
 func (api *FollowApi) Follow(c *gin.Context) {
-	var param request.FollowRequest
+	var param vo.FollowVo
 	if err := c.ShouldBind(&param); err != nil {
 		r.FailWithMessage(c, "参数校验失败")
 	}

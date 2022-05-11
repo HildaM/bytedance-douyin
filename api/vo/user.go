@@ -1,16 +1,30 @@
 package vo
 
-/**
- * @Author: 1999single
- * @Description:
- * @File: user
- * @Version: 1.0.0
- * @Date: 2022/5/11 1:27
- */
+// 注册、登录
+type UserVo struct {
+	Username string `form:"username" binding:"required,max=32"`
+	Password string `form:"password" binding:"required,max=32"`
+}
+
+// 用户信息
+type UserInfoVo struct {
+	UserId int64  `form:"user_id" binding:"required"`
+	Token  string `form:"token" binding:"required"`
+}
+
+type UserResponseVo struct {
+	UserId int64  `json:"user_id" binding:"required"`
+	Token  string `json:"token" binding:"required"`
+}
+
+type UserInfoResponseVo struct {
+	User *UserInfo `json:"user" binding:"required"`
+}
+
 type UserInfo struct {
 	Id            int64  `json:"id" binding:"required"`
 	Name          string `json:"name" binding:"required"`
-	FollowCount   int  `json:"follow_count" binding:"required"`
-	FollowerCount int  `json:"follower_count" binding:"required"`
-	Follow      bool   `json:"is_follow" binding:"required"`
+	FollowCount   int64  `json:"follow_count" binding:"required"`
+	FollowerCount int64  `json:"follower_count" binding:"required"`
+	IsFollow      bool   `json:"is_follow" binding:"required"`
 }

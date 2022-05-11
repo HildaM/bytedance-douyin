@@ -1,7 +1,9 @@
 package service
 
 import (
+	"bytedance-douyin/api/vo"
 	"bytedance-douyin/service/bo"
+	"github.com/u2takey/go-utils/encrypt"
 )
 
 /**
@@ -13,18 +15,26 @@ import (
  */
 type UserService struct{}
 
-func (userService *UserService) GetUserInfo(userId int) (bo.User, error) {
+func (userService UserService) GetUserInfo(userId int) (bo.UserInfoBo, error) {
 
-	userBo := bo.User{}
+	userInfoBo := bo.UserInfoBo{}
 	userModel, err := userDao.GetUser(userId)
 	if err != nil {
-		return userBo, err
+		return userInfoBo, err
 	}
-	userBo.ID = userModel.ID
-	userBo.Name = userModel.Name
-	userBo.FollowCount = userModel.FollowCount
-	userBo.FollowerCount = userModel.FollowerCount
+	userInfoBo.ID = userModel.ID
+	userInfoBo.Name = userModel.Name
+	//userInfoBo.FollowCount = userModel.FollowCount
+	//userInfoBo.FollowerCount = userModel.FollowerCount
 	// 相关接口待实现
-	userBo.Follow = false
-	return userBo, nil
+	userInfoBo.Follow = false
+	return userInfoBo, nil
+}
+
+func (UserService) RegisterUser(user vo.UserVo) {
+	var userBo bo.UserBo
+	userBo.Name = user.Username
+	userBo.Pwd = encrypt.Md5([]byte(user.Password))
+	userDao.RegisterUser(userBo)
+
 }

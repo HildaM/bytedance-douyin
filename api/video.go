@@ -1,14 +1,12 @@
 package api
 
 import (
-	"bytedance-douyin/api/data"
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/global"
 	"bytedance-douyin/utils"
 	"fmt"
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 /**
@@ -59,11 +57,11 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 
 // 视频流接口
 func (api *VideoApi) VideoFeed(c *gin.Context) {
-	videoList := make([]*data.Video, 1, 1)
-	user := data.Author{Id: 1, Name: "charon", FollowCount: 0, FollowerCount: 1, IsFollow: false}
-	videoList[0] = &data.Video{Id: 1, Author: &user, PlayUrl: "http://220.243.147.162:8080/videos/sss.mp4", CoverUrl: "http://220.243.147.162:8080/images/sss.jpg", FavoriteCount: 0, CommentCount: 0, IsFavorite: false}
-	data := data.FeedData{NextTime: time.Now().Unix(), VideoList: videoList}
-	response.OkWithData(c, data)
+	//videoList := make([]*data.Video, 1, 1)
+	//user := data.Author{Id: 1, Name: "charon", FollowCount: 0, FollowerCount: 1, IsFollow: false}
+	//videoList[0] = &data.Video{Id: 1, Author: &user, PlayUrl: "http://220.243.147.162:8080/videos/sss.mp4", CoverUrl: "http://220.243.147.162:8080/images/sss.jpg", FavoriteCount: 0, CommentCount: 0, IsFavorite: false}
+	//data := data.FeedData{NextTime: time.Now().Unix(), VideoList: videoList}
+	//response.OkWithData(c, data)
 }
 
 func (api *VideoApi) VideoList(c *gin.Context) {

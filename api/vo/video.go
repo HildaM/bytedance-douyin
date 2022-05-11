@@ -1,15 +1,38 @@
-package data
+package vo
 
-type FeedData struct {
+// 点赞操作
+type FavoriteActionVo struct {
+	UserId     int64  `form:"user_id" binding:"required"`
+	Token      string `form:"token" binding:"required"`
+	VideoId    int64  `form:"video_id" binding:"required"`
+	ActionType int8   `form:"action_type" binding:"required,oneof=1 2"`
+}
+
+// 点赞列表
+type FavoriteListVo struct {
+	UserId int64  `form:"user_id" binding:"required"`
+	Token  string `form:"token" binding:"required"`
+}
+
+// 视频流
+type FeedVo struct {
+	LatestTime int32 `form:"latest_time"`
+}
+
+type VideoListVo struct {
+	Token string `form:"token" binding:"required"`
+}
+
+type FeedResponseVo struct {
 	NextTime  int64    `json:"next_time"`
 	VideoList []*Video `json:"video_list" binding:"required"`
 }
 
-type PublishData struct {
+type PublishResponseVo struct {
 	VideoList []*Video `json:"video_list" binding:"required"`
 }
 
-type FavoriteData struct {
+type FavoriteResponseVo struct {
 	VideoList []*Video `json:"video_list" binding:"required"`
 }
 

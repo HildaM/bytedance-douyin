@@ -13,7 +13,7 @@ type Group struct {
 	UserService UserService
 }
 
-var GroupApp = new(Group)
+var GroupApp Group
 
 // repository
 var (

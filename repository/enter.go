@@ -12,4 +12,4 @@ type Group struct {
 	UserDao UserDao
 }
 
-var GroupApp = new(Group)
+var GroupApp Group
