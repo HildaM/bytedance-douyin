@@ -4,7 +4,6 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"fmt"
 )
 
 /**
@@ -16,7 +15,7 @@ import (
  */
 type UserDao struct{}
 
-func (UserDao) GetUser(userId int) (model.UserDao, error) {
+func (UserDao) GetUser(userId int64) (model.UserDao, error) {
 	user := model.UserDao{}
 	if result := global.GVA_DB.Where("id = ?", userId).First(&user); result.Error != nil {
 		return user, result.Error
@@ -25,9 +24,14 @@ func (UserDao) GetUser(userId int) (model.UserDao, error) {
 }
 
 func (UserDao) RegisterUser(userBo bo.UserBo) (userId int64) {
-	fmt.Println(userBo)
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
 	global.GVA_DB.Create(&user)
 	userId = user.ID
 	return
+}
+
+func (u *UserDao) LoginUser(userBo bo.UserBo) (userId int64) {
+	var userLoginBo bo.UserLoginBo
+	global.GVA_DB.Where("username = ? and password = ?", userBo.Name, userBo.Pwd).Find(&userLoginBo)
+	return userLoginBo.Id
 }

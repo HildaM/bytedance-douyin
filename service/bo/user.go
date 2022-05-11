@@ -19,3 +19,7 @@ type UserBo struct {
 	Name string
 	Pwd  string
 }
+
+type UserLoginBo struct {
+	Id int64
+}

@@ -1,5 +1,7 @@
 package vo
 
+import "github.com/golang-jwt/jwt"
+
 // 注册、登录
 type UserVo struct {
 	Username string `form:"username" binding:"required,max=32"`
@@ -18,13 +20,23 @@ type UserResponseVo struct {
 }
 
 type UserInfoResponseVo struct {
-	User *UserInfo `json:"user" binding:"required"`
+	User *userInfo `json:"user" binding:"required"`
 }
 
-type UserInfo struct {
+type userInfo struct {
 	Id            int64  `json:"id" binding:"required"`
 	Name          string `json:"name" binding:"required"`
 	FollowCount   int64  `json:"follow_count" binding:"required"`
 	FollowerCount int64  `json:"follower_count" binding:"required"`
 	IsFollow      bool   `json:"is_follow" binding:"required"`
+}
+
+type CustomClaims struct {
+	BaseClaims
+	jwt.StandardClaims
+}
+
+type BaseClaims struct {
+	Id   int64  `json:"id" binding:"required"`
+	Name string `json:"name" binding:"required"`
 }

@@ -6,6 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/viper v1.11.0
 	go.uber.org/zap v1.21.0
@@ -22,6 +23,14 @@ require (
 	github.com/u2takey/ffmpeg-go v0.4.1
 	github.com/u2takey/go-utils v0.3.1
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
+)
+
+// gjson
+
+require (
+	github.com/tidwall/gjson v1.14.1
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 )
 
 require (

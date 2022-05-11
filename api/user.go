@@ -3,9 +3,9 @@ package api
 import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 /**
@@ -24,24 +24,42 @@ func (api *UserApi) Register(c *gin.Context) {
 	}
 
 	userId := userService.RegisterUser(userRegister)
-	// todo 拿到token
-	token := "123123123"
+	bc := vo.BaseClaims{Id: userId, Name: userRegister.Username}
+	token, err := utils.GenerateAndSaveToken(bc)
+	if err != nil {
+		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+	}
 	urv := vo.UserResponseVo{UserId: userId, Token: token}
 	response.OkWithData(c, urv)
 }
 
 func (api *UserApi) Login(c *gin.Context) {
-	// 示例
-	//user := data.UserInfo{User: &vo.UserInfo{Id: 1, Name: "123", FollowCount: 1, FollowerCount: 1, Follow: true}}
-	//response.OkWithData(c, user)
+	var userLogin vo.UserVo
+	if err := c.ShouldBind(&userLogin); err != nil {
+		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+	}
+	userId := userService.LoginUser(userLogin)
+	bc := vo.BaseClaims{Id: userId, Name: userLogin.Username}
+	token, err := utils.GenerateAndSaveToken(bc)
+	if err != nil {
+		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+	}
+	urv := vo.UserResponseVo{UserId: userId, Token: token}
+	response.OkWithData(c, urv)
 }
 
 func (api *UserApi) UserInfo(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Query("user_id"))
-	userBO, _ := userService.GetUserInfo(userId)
-	userVO := &vo.UserInfo{}
-	userVO.Id = userBO.ID
-	userVO.Name = userBO.Name
+	var userInfo vo.UserInfoVo
+	if err := c.ShouldBind(&userInfo); err != nil {
+		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+	}
+	//token := userInfo.Token
+	userService.GetUserInfo(userInfo)
+	//userId, _ := strconv.Atoi(c.Query("user_id"))
+	//userBO, _ := userService.GetUserInfo(userId)
+	//userVO := &vo.UserInfo{}
+	//userVO.Id = userBO.ID
+	//userVO.Name = userBO.Name
 	//userVO.FollowerCount = userBO.FollowerCount
 	//userVO.FollowCount = userBO.FollowCount
 	//userVO.Follow = userBO.Follow

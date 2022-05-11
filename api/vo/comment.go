@@ -19,7 +19,7 @@ type CommentListRequest struct {
 
 type Comment struct {
 	Id         int64     `json:"id"`
-	User       *UserInfo `json:"user"`
+	User       *userInfo `json:"user"`
 	Content    string    `json:"content"`
 	CreateDate string    `json:"create_date" time_format:"01-02"`
 }
