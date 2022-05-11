@@ -19,8 +19,6 @@ import (
  * @Date: 2022/5/6 15:59
  */
 
-
-
 func Zap() (logger *zap.Logger) {
 	if ok, _ := utils.PathExists(global.GVA_CONFIG.Zap.Director); !ok { // 判断是否有Director文件夹
 		fmt.Printf("create %v directory\n", global.GVA_CONFIG.Zap.Director)

@@ -5,6 +5,8 @@ go 1.17
 require (
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-gonic/gin v1.7.7
+	github.com/go-redis/redis/v8 v8.11.5
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/viper v1.11.0
 	go.uber.org/zap v1.21.0
@@ -19,12 +21,14 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/u2takey/ffmpeg-go v0.4.1
-	github.com/u2takey/go-utils v0.3.1 // indirect
+	github.com/u2takey/go-utils v0.3.1
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
 )
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

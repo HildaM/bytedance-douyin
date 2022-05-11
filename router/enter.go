@@ -1,7 +1,5 @@
 package router
 
-import "bytedance-douyin/router/backend"
-
 /**
  * @Author: 1999single
  * @Description:
@@ -10,9 +8,12 @@ import "bytedance-douyin/router/backend"
  * @Date: 2022/5/6 17:27
  */
 
-type RouterGroup struct {
-	Backend backend.RouterGroup
-
+type Group struct {
+	UserRouter
+	LikeRouter
+	CommentRouter
+	VideoRouter
+	FollowRouter
 }
 
-var RouterGroupApp = new(RouterGroup)
+var GroupApp = new(Group)

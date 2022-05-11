@@ -10,5 +10,30 @@ zap:
   log-in-console: true
 
 file:
-  video-output: /home/charon/files/videos/
-  image-output: /home/charon/files/images/
+  video-output: /home/files/videos/
+  image-output: /home/files/images/
+
+redis:
+  addr: '220.243.147.162'
+  port: '6379'
+  password: '220429douyin'
+  db: '0'
+  poolsize: '100'
+
+
+mysql:
+  path: '220.243.147.162'
+  port: '3306'
+  config: 'charset=utf8mb4&parseTime=True'
+  db-name: 'douyin'
+  username: 'root'
+  password: '220429douyin'
+  max-idle-conns: 10
+  max-open-conns: 100
+  log-mode: ""
+  log-zap: false
+
+jwt:
+  signing-key: '220429douyin'
+  expires-time: 604800
+  issuer: 'sota'

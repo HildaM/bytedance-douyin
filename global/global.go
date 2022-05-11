@@ -2,8 +2,10 @@ package global
 
 import (
 	"bytedance-douyin/config"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 /**
@@ -18,9 +20,6 @@ var (
 	GVA_LOG    *zap.Logger
 	GVA_CONFIG config.Server
 	GVA_VP     *viper.Viper
-)
-
-// 数据库相关
-var (
-	MYSQL_URL string
+	GVA_REDIS  *redis.Client
+	GVA_DB     *gorm.DB
 )
