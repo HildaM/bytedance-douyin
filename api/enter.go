@@ -22,5 +22,6 @@ var GroupApp Group
 
 // service
 var (
-	userService = service.GroupApp.UserService
+	userService   = service.GroupApp.UserService
+	followService = service.GroupApp.FollowService
 )

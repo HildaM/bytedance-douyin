@@ -9,7 +9,8 @@ package repository
  */
 
 type Group struct {
-	UserDao UserDao
+	UserDao   UserDao
+	FollowDao FollowDao
 }
 
 var GroupApp Group

@@ -32,10 +32,16 @@ func (api *FollowApi) Follow(c *gin.Context) {
 // 	@Author Quan
 //
 func (api *FollowApi) FollowList(c *gin.Context) {
-	var followList vo.FollowListVo
-	if err := c.ShouldBind(&followList); err != nil {
+	var userInfo vo.FollowListVo
+	if err := c.ShouldBind(&userInfo); err != nil {
 		r.FailWithMessage(c, "参数校验失败")
 	}
+
+	userList, err := followService.GetFollowList(userInfo)
+	if err != nil {
+		// TODO 处理错误
+	}
+	r.OkWithData(c, userList)
 }
 
 func (api *FollowApi) FansList(c *gin.Context) {

@@ -4,5 +4,6 @@
 
 package bo
 
-type FollowBo struct {
-}
+//type FollowResponseBo struct {
+//	UserList []*vo.userInfo
+//}
