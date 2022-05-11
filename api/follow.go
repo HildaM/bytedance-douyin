@@ -23,8 +23,19 @@ func (api *FollowApi) Follow(c *gin.Context) {
 
 }
 
+//
+//  FollowList
+//  @Description:	获取粉丝列表
+//  @receiver api
+//  @param c
+//	@Request body:	user_id, token
+// 	@Author Quan
+//
 func (api *FollowApi) FollowList(c *gin.Context) {
-
+	var followList vo.FollowListVo
+	if err := c.ShouldBind(&followList); err != nil {
+		r.FailWithMessage(c, "参数校验失败")
+	}
 }
 
 func (api *FollowApi) FansList(c *gin.Context) {

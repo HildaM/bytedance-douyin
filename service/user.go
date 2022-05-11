@@ -55,9 +55,9 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 
 	userInfoBo.ID = userModel.ID
 	userInfoBo.Name = userModel.Name
+	//  TODO 相关接口待实现
 	//userInfoBo.FollowCount = userModel.FollowCount
 	//userInfoBo.FollowerCount = userModel.FollowerCount
-	// 相关接口待实现
 	userInfoBo.Follow = false
 	return userInfoBo, nil
 }
