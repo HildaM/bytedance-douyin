@@ -24,9 +24,10 @@ func (UserDao) GetUser(userId int) (model.UserDao, error) {
 	return user, nil
 }
 
-func (UserDao) RegisterUser(userBo bo.UserBo) {
+func (UserDao) RegisterUser(userBo bo.UserBo) (userId int64) {
 	fmt.Println(userBo)
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
 	global.GVA_DB.Create(&user)
-	fmt.Printf("%+v", user)
+	userId = user.ID
+	return
 }

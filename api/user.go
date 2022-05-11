@@ -23,8 +23,11 @@ func (api *UserApi) Register(c *gin.Context) {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 
-	userService.RegisterUser(userRegister)
-
+	userId := userService.RegisterUser(userRegister)
+	// todo 拿到token
+	token := "123123123"
+	urv := vo.UserResponseVo{UserId: userId, Token: token}
+	response.OkWithData(c, urv)
 }
 
 func (api *UserApi) Login(c *gin.Context) {

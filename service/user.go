@@ -31,10 +31,10 @@ func (userService UserService) GetUserInfo(userId int) (bo.UserInfoBo, error) {
 	return userInfoBo, nil
 }
 
-func (UserService) RegisterUser(user vo.UserVo) {
+func (UserService) RegisterUser(user vo.UserVo) (userId int64) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
 	userBo.Pwd = encrypt.Md5([]byte(user.Password))
-	userDao.RegisterUser(userBo)
-
+	userId = userDao.RegisterUser(userBo)
+	return
 }
