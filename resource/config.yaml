@@ -32,3 +32,8 @@ mysql:
   max-open-conns: 100
   log-mode: ""
   log-zap: false
+
+jwt:
+  signing-key: '220429douyin'
+  expires-time: 604800
+  issuer: 'sota'

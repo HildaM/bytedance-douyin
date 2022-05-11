@@ -14,7 +14,7 @@ import (
  */
 type Base struct {
 	ID         int64          `gorm:"primarykey"` // 主键ID
-	CreateTime time.Time      // 创建时间
-	UpdateTime time.Time      // 更新时间
-	DeleteTime gorm.DeletedAt `gorm:"index" json:"-"` // 删除时间
+	CreatedAt time.Time      // 创建时间
+	UpdatedAt time.Time      // 更新时间
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"` // 删除时间
 }

@@ -13,4 +13,5 @@ type Server struct {
 	File  File  `mapstructure:"file" json:"file" yaml:"file"`
 	Redis Redis `mapstructure:"redis" json:"redis" yaml:"redis"`
 	Mysql Mysql `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
+	JWT   JWT   `mapstructure:"jwt" json:"jwt" yaml:"jwt"`
 }
