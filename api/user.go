@@ -45,6 +45,7 @@ func (UserApi) Login(c *gin.Context) {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 	urv := vo.UserResponseVo{UserId: userId, Token: token}
+	fmt.Println(token)
 	response.OkWithData(c, urv)
 }
 
@@ -52,9 +53,19 @@ func (api *UserApi) UserInfo(c *gin.Context) {
 	var userInfo vo.UserInfoVo
 	if err := c.ShouldBind(&userInfo); err != nil {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		return
 	}
 	//token := userInfo.Token
-	userService.GetUserInfo(userInfo)
+	info, err := userService.GetUserInfo(userInfo)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
+
+	u := vo.UserInfo{Id: info.Id, Name: info.Name, FollowCount: info.FollowCount, FollowerCount: info.FollowerCount, IsFollow: info.Follow}
+
+	data := vo.UserInfoResponseVo{User: u}
+	response.OkWithData(c, data)
 	//userId, _ := strconv.Atoi(c.Query("user_id"))
 	//userBO, _ := userService.GetUserInfo(userId)
 	//userVO := &vo.UserInfo{}

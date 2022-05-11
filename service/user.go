@@ -4,7 +4,6 @@ import (
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"bytedance-douyin/utils"
 	"fmt"
 	"github.com/u2takey/go-utils/encrypt"
 	"sync"
@@ -21,14 +20,14 @@ type UserService struct{}
 
 func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	userId := userInfo.UserId
-	token := userInfo.Token
-	isMyself, toId, err := utils.DoubleCheckToken(userId, token)
+	toId := userInfo.Claims.BaseClaims.Id
+
+	isMyself := userId == toId
+
 	userInfoBo := bo.UserInfoBo{}
-	if err != nil {
-		return userInfoBo, err
-	}
 
 	var userModel model.UserDao
+	var err error
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 	go func() {
@@ -53,10 +52,10 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 		return userInfoBo, err
 	}
 
-	userInfoBo.ID = userModel.ID
+	userInfoBo.Id = userModel.ID
 	userInfoBo.Name = userModel.Name
-	//userInfoBo.FollowCount = userModel.FollowCount
-	//userInfoBo.FollowerCount = userModel.FollowerCount
+	userInfoBo.FollowCount = 0
+	userInfoBo.FollowerCount = 0
 	// 相关接口待实现
 	userInfoBo.Follow = false
 	return userInfoBo, nil
