@@ -20,6 +20,11 @@ type UserBo struct {
 	Pwd  string
 }
 
+type UserRegisterBo struct {
+	Id    int64
+	Token string
+}
+
 type UserLoginBo struct {
 	Id int64
 }

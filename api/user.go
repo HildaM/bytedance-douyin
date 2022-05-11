@@ -17,23 +17,23 @@ import (
  */
 type UserApi struct{}
 
-func (api *UserApi) Register(c *gin.Context) {
+func (UserApi) Register(c *gin.Context) {
 	var userRegister vo.UserVo
 	if err := c.ShouldBind(&userRegister); err != nil {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 
-	userId := userService.RegisterUser(userRegister)
-	bc := vo.BaseClaims{Id: userId, Name: userRegister.Username}
-	token, err := utils.GenerateAndSaveToken(bc)
+	urb, err := userService.RegisterUser(userRegister)
 	if err != nil {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		return
 	}
-	urv := vo.UserResponseVo{UserId: userId, Token: token}
+
+	urv := vo.UserResponseVo{UserId: urb.Id, Token: urb.Token}
 	response.OkWithData(c, urv)
 }
 
-func (api *UserApi) Login(c *gin.Context) {
+func (UserApi) Login(c *gin.Context) {
 	var userLogin vo.UserVo
 	if err := c.ShouldBind(&userLogin); err != nil {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))

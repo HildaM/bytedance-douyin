@@ -1,6 +1,9 @@
 package vo
 
-import "github.com/golang-jwt/jwt"
+import (
+	"github.com/golang-jwt/jwt"
+	jsoniter "github.com/json-iterator/go"
+)
 
 // 注册、登录
 type UserVo struct {
@@ -39,4 +42,8 @@ type CustomClaims struct {
 type BaseClaims struct {
 	Id   int64  `json:"id" binding:"required"`
 	Name string `json:"name" binding:"required"`
+}
+
+func (m *BaseClaims) MarshalBinary() (data []byte, err error) {
+	return jsoniter.Marshal(m)
 }

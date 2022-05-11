@@ -62,12 +62,15 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	return userInfoBo, nil
 }
 
-func (UserService) RegisterUser(user vo.UserVo) (userId int64) {
+func (UserService) RegisterUser(user vo.UserVo) (bo.UserRegisterBo, error) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
 	userBo.Pwd = encrypt.Md5([]byte(user.Password))
-	userId = userDao.RegisterUser(userBo)
-	return
+	urb, err := userDao.RegisterUser(userBo)
+	if err != nil {
+		return urb, err
+	}
+	return urb, nil
 }
 
 func (UserService) LoginUser(user vo.UserVo) (userId int64) {

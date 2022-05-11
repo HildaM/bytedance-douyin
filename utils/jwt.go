@@ -29,7 +29,6 @@ var (
 	TokenNotValidYet = errors.New("Token not active yet")
 	TokenMalformed   = errors.New("That's not even a token")
 	TokenInvalid     = errors.New("Couldn't handle this token:")
-	EXPIRE_TIME      = global.GVA_CONFIG.JWT.ExpiresTime
 )
 
 func NewJWT() *JWT {
@@ -91,7 +90,8 @@ func GenerateAndSaveToken(claims vo.BaseClaims) (string, error) {
 		return "", err
 	}
 
-	if err := global.GVA_REDIS.SetEX(context.Background(), token, claims, time.Duration(EXPIRE_TIME)).Err(); err != nil {
+	et := global.GVA_CONFIG.JWT.ExpiresTime
+	if err := global.GVA_REDIS.SetEX(context.Background(), token, &customClaim.BaseClaims, time.Duration(et)*time.Second).Err(); err != nil {
 		return "", err
 	}
 	return token, nil
