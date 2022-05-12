@@ -49,9 +49,9 @@ func (UserApi) Login(c *gin.Context) {
 	token, err := utils.GenerateAndSaveToken(bc)
 	if err != nil {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		return
 	}
 	urv := vo.UserResponseVo{UserId: userId, Token: token}
-	fmt.Println(token)
 	response.OkWithData(c, urv)
 }
 

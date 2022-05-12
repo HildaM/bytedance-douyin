@@ -52,7 +52,7 @@ func (UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 }
 
 func (u *UserDao) QueryUserByNameAndPassword(userBo bo.UserBo) (userId int64) {
-	var userLoginBo bo.UserLoginBo
-	global.GVA_DB.Where("username = ? and password = ?", userBo.Name, userBo.Pwd).Find(&userLoginBo)
-	return userLoginBo.Id
+	var user model.UserDao
+	global.GVA_DB.Where("name = ? and password = ?", userBo.Name, userBo.Pwd).Select("id").Find(&user)
+	return user.ID
 }
