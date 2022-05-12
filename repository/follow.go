@@ -12,7 +12,7 @@ import (
 
 type FollowDao struct{}
 
-//  GetFollowList get Follow List
+// GetFollowList get Follow List
 func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 
@@ -49,8 +49,8 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 
 //  getToUserIdList use userId to find to_user_id list
 func getToUserIdList(userId int64) ([]int64, error) {
-	follows := []model.Follow{}
-	toUserIdList := []int64{}
+	var follows []model.Follow
+	var toUserIdList []int64
 
 	// select to_user_id from t_follow where user_id = userId
 	if result := global.GVA_DB.Select("to_user_id").Where("user_id = ?", userId).Find(&follows); result.Error != nil {
