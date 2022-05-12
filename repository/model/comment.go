@@ -11,7 +11,7 @@ type Comment struct {
 	Base
 	VideoId int64
 	UserId  int64
-	CommentText string
+	Content string
 }
 
 // 表名

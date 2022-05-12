@@ -47,11 +47,12 @@ func (api *CommentApi) CommentOPS(c *gin.Context) {
 
 func (api *CommentApi) CommentList(c *gin.Context) {
 	videoId, _ := strconv.Atoi(c.Query("video_id"))
-	list, err := commentService.GetCommentList(int64(videoId))
+	userId, _ := strconv.Atoi(c.Query("user_id"))
+	list, err := commentService.GetCommentList(int64(userId), int64(videoId))
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
 	fmt.Println(list)
-	response.OkWithData(c, bo.Data{CommentList: *list})
+	response.OkWithData(c, vo.CommentResponseVo{CommentList: *list})
 }

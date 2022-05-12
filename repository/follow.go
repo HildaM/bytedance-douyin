@@ -16,11 +16,11 @@ import (
 type FollowDao struct{}
 
 // GetFollowList get Follow List
-func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
+func (dao FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 
 	//	1. userId --> to_userId list
-	toUserIdList, err := getToUserIdList(userId)
+	toUserIdList, err := dao.GetToUserIdList(userId)
 	if err != nil {
 		return followList, err
 	}
@@ -51,7 +51,7 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 }
 
 //  getToUserIdList use userId to find to_user_id list
-func getToUserIdList(userId int64) ([]int64, error) {
+func (FollowDao) GetToUserIdList(userId int64) ([]int64, error) {
 	var follows []model.Follow
 	var toUserIdList []int64
 

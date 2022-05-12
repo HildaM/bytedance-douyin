@@ -4,6 +4,7 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
+	"gorm.io/gorm"
 )
 
 /**
@@ -17,7 +18,10 @@ type CommentDao struct{}
 
 func (CommentDao) GetCommentList(videoId int64) (*[]bo.Comment, error) {
 	comments := make([]bo.Comment, 0)
-	result := global.GVA_DB.Preload("User").Find(&comments)
+	result := global.GVA_DB.Model(&model.Comment{}).Preload("User", func(db *gorm.DB) *gorm.DB {
+		return db.Table(model.UserDao{}.TableName())
+	}).Where("video_id = ?", videoId).Find(&comments)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -30,7 +34,7 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 			ID: CommentId,
 		},
 	}
-	if result := global.GVA_DB.Delete(comment); result.Error != nil {
+	if result := global.GVA_DB.Delete(&comment); result.Error != nil {
 		return result.Error
 	}
 	return nil
@@ -38,11 +42,11 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 
 func (CommentDao) PostComment(post bo.CommentPost) error {
 	comment := model.Comment{
-		VideoId:     post.VideoId,
-		UserId:      post.UserId,
-		CommentText: post.CommentText,
+		VideoId: post.VideoId,
+		UserId:  post.UserId,
+		Content: post.CommentText,
 	}
-	if result := global.GVA_DB.Create(comment); result.Error != nil {
+	if result := global.GVA_DB.Create(&comment); result.Error != nil {
 		return result.Error
 	}
 	return nil

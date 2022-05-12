@@ -14,11 +14,6 @@ const (
 
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fwk := c.Request.Header.Get("fangkaiwo")
-		if fwk == "haode" {
-			c.Next()
-			return
-		}
 		// 验证请求是否携带token
 		token := ""
 		switch c.Request.Method {
@@ -26,6 +21,11 @@ func JWTAuth() gin.HandlerFunc {
 			token = c.Query("token")
 		case "POST":
 			token = c.PostForm("token")
+		}
+		// todo 为了方便测试，token为fangkaiwo时通过身份验证。
+		if token == "fangkaiwo" {
+			c.Next()
+			return
 		}
 		if token == "" {
 			response.FailWithMessage(c, REJECT_REQUEST)

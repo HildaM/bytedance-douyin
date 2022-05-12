@@ -1,5 +1,7 @@
 package vo
 
+import "bytedance-douyin/types"
+
 // 评论、删除评论
 type CommentActionRequest struct {
 	UserId      int64  `form:"user_id" binding:"required"`
@@ -19,7 +21,7 @@ type Comment struct {
 	Id         int64     `json:"id"`
 	User       UserInfo `json:"user"`
 	Content    string    `json:"content"`
-	CreateDate string    `json:"create_date" time_format:"01-02"`
+	CreateDate types.Time    `json:"create_date"`
 }
 
 type CommentResponseVo struct {
