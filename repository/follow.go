@@ -108,7 +108,7 @@ func followUser(followInfo bo.FollowBo) error {
 
 // UnFollowUser delete row from t_follow
 // 如果在已经关注的情况下，存在deleted_at。则先删除deleted_at条目，再将最新的关注标记为”软删除“。已达到更新软删除的目的
-// 漏洞：如果在未关注情况下，连续调用两次这个方法，那么会将最后一个软删除删掉
+// TODO 漏洞：如果在未关注情况下，连续调用两次这个方法，那么会将最后一个软删除删掉
 func (FollowDao) UnFollowUser(followInfo bo.FollowBo) error {
 	// 1. 前置判断
 	var follow model.Follow
@@ -142,4 +142,16 @@ func unFollowUser(followInfo bo.FollowBo) error {
 	}
 
 	return nil
+}
+
+// GetFollowCount
+func (FollowDao) GetFollowCount(followInfo bo.FollowBo) (int64, error) {
+	db := global.GVA_DB
+
+	var count int64
+	if err := db.Model(&model.Follow{}).Where("user_id = ? and to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
