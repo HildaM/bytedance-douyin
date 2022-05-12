@@ -11,6 +11,7 @@ package repository
 type Group struct {
 	UserDao   UserDao
 	FollowDao FollowDao
+	CommentDao CommentDao
 }
 
 var GroupApp Group

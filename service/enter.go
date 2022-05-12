@@ -13,12 +13,14 @@ type Group struct {
 	UserService     UserService
 	FollowService   FollowService
 	FollowerService FollowerService
+	CommentService CommentService
 }
 
 var GroupApp Group
 
 // repository
 var (
-	userDao   = repository.GroupApp.UserDao
+	userDao = repository.GroupApp.UserDao
+	commentDao = repository.GroupApp.CommentDao
 	followDao = repository.GroupApp.FollowDao
 )
