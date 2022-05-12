@@ -33,6 +33,7 @@ func (FollowService) GetFollowList(userInfo vo.FollowListVo) (vo.FollowResponseV
 	return followedUserList, nil
 }
 
+// FollowOrNot 关注与取消关注
 func (FollowService) FollowOrNot(followInfo vo.FollowVo) (string, error) {
 	followBo := bo.FollowBo{
 		UserId:   followInfo.UserId,
@@ -54,4 +55,20 @@ func (FollowService) FollowOrNot(followInfo vo.FollowVo) (string, error) {
 	}
 
 	return action, nil
+}
+
+// GetFollowCount 获取关注数
+func (FollowService) GetFollowCount(followInfo vo.FollowVo) (int64, error) {
+	followBo := bo.FollowBo{
+		UserId:   followInfo.UserId,
+		ToUserId: followInfo.ToUserId,
+	}
+
+	count, err := followDao.GetFollowCount(followBo)
+	if err != nil {
+		global.GVA_LOG.Error(err.Error())
+		return 0, err
+	}
+
+	return count, nil
 }
