@@ -4,12 +4,12 @@
 
 package model
 
-type FollowDao struct {
+type Follow struct {
 	Base
 	UserId   int64 `gorm:"type:bigint"`
 	ToUserId int64 `gorm:"type:bigint"`
 }
 
-func (FollowDao) TableName() string {
+func (Follow) TableName() string {
 	return "t_follow"
 }

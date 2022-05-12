@@ -3,6 +3,7 @@ package api
 import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,11 +17,25 @@ import (
 type FollowApi struct{}
 
 func (api *FollowApi) Follow(c *gin.Context) {
-	var param vo.FollowVo
-	if err := c.ShouldBind(&param); err != nil {
+	var followInfo vo.FollowVo
+	if err := c.ShouldBind(&followInfo); err != nil {
 		r.FailWithMessage(c, "参数校验失败")
 	}
 
+	var err error
+	var code string
+	if code, err = followService.FollowOrNot(followInfo); err != nil {
+		r.FailWithMessage(c, err.Error())
+		return
+	}
+	action := func(code string) string {
+		if code == "1" {
+			return "关注"
+		}
+		return "取消关注"
+	}(code)
+
+	r.OkWithMessage(c, action+"成功")
 }
 
 //
@@ -39,7 +54,7 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 
 	userList, err := followService.GetFollowList(userInfo)
 	if err != nil {
-		// TODO 处理错误
+		r.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 	r.OkWithData(c, userList)
 }

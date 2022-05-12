@@ -15,7 +15,6 @@ type UserDao struct {
 	FollowerCount int64
 }
 
-// 表名
 func (UserDao) TableName() string {
 	return "t_user"
 }

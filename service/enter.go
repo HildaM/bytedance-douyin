@@ -21,4 +21,5 @@ var GroupApp Group
 var (
 	userDao = repository.GroupApp.UserDao
 	commentDao = repository.GroupApp.CommentDao
+	followDao = repository.GroupApp.FollowDao
 )
