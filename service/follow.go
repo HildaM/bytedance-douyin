@@ -5,7 +5,8 @@ package service
 
 import (
 	"bytedance-douyin/api/vo"
-	"bytedance-douyin/repository"
+	"bytedance-douyin/global"
+	"bytedance-douyin/service/bo"
 )
 
 type FollowService struct{}
@@ -21,16 +22,36 @@ type FollowerService struct{}
 func (FollowService) GetFollowList(userInfo vo.FollowListVo) (vo.FollowResponseVo, error) {
 	var followedUserList vo.FollowResponseVo
 
-	// TODO 获取该用户的关注列表
-	// 	从UserService中获取UserInfoBo的List
 	//	根据user_id获取userList
 	var userId = userInfo.UserId
 	var err error
-	followDao := repository.GroupApp.FollowDao
 	followedUserList, err = followDao.GetFollowList(userId)
 	if err != nil {
-		// TODO
+		return followedUserList, err
 	}
 
 	return followedUserList, nil
+}
+
+func (FollowService) FollowOrNot(followInfo vo.FollowVo) (string, error) {
+	followBo := bo.FollowBo{
+		UserId:   followInfo.UserId,
+		ToUserId: followInfo.ToUserId,
+	}
+
+	// actionType:1 - 关注	actionType:2 - 取消关注
+	var err error
+	action := followInfo.ActionType
+	switch action {
+	case "1":
+		err = followDao.FollowUser(followBo)
+	case "2":
+		err = followDao.UnFollowUser(followBo)
+	}
+	if err != nil {
+		global.GVA_LOG.Error(err.Error())
+		return "", err
+	}
+
+	return action, nil
 }

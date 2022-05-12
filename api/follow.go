@@ -17,11 +17,25 @@ import (
 type FollowApi struct{}
 
 func (api *FollowApi) Follow(c *gin.Context) {
-	var param vo.FollowVo
-	if err := c.ShouldBind(&param); err != nil {
+	var followInfo vo.FollowVo
+	if err := c.ShouldBind(&followInfo); err != nil {
 		r.FailWithMessage(c, "参数校验失败")
 	}
 
+	var err error
+	var code string
+	if code, err = followService.FollowOrNot(followInfo); err != nil {
+		r.FailWithMessage(c, err.Error())
+		return
+	}
+	action := func(code string) string {
+		if code == "1" {
+			return "关注"
+		}
+		return "取消关注"
+	}(code)
+
+	r.OkWithMessage(c, action+"成功")
 }
 
 //

@@ -40,6 +40,7 @@ func Routers() *gin.Engine {
 		// 不做鉴权
 		router.InitBaseUserRouter(PublicGroup)  // 注册、登录
 		router.InitVideoFeedRouter(PublicGroup) // 视频流
+		router.InitFollowRouter(PublicGroup)
 	}
 	PrivateGroup := Router.Group("douyin")
 	PrivateGroup.Use(middleware.JWTAuth()) //.Use(middleware.CasbinHandler())
@@ -48,7 +49,7 @@ func Routers() *gin.Engine {
 		router.InitUserInfoRouter(PrivateGroup) // 查看用户信息
 		router.InitVideoRouter(PrivateGroup)
 		router.InitCommentRouter(PrivateGroup)
-		router.InitFollowRouter(PrivateGroup)
+		//router.InitFollowRouter(PrivateGroup)
 		router.InitLikeRouter(PrivateGroup)
 	}
 
