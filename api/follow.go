@@ -3,6 +3,7 @@ package api
 import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,7 +40,7 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 
 	userList, err := followService.GetFollowList(userInfo)
 	if err != nil {
-		// TODO 处理错误
+		r.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 	r.OkWithData(c, userList)
 }

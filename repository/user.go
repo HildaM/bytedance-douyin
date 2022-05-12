@@ -23,6 +23,14 @@ func (UserDao) GetUser(userId int64) (model.UserDao, error) {
 	return user, nil
 }
 
+func (UserDao) GetUsers(userIds []int64) ([]model.UserDao, error) {
+	users := []model.UserDao{}
+	if result := global.GVA_DB.Where("id in (?)", userIds).Find(&users); result.Error != nil {
+		return users, result.Error
+	}
+	return users, nil
+}
+
 func (UserDao) RegisterUser(userBo bo.UserBo) (userId int64) {
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
 	global.GVA_DB.Create(&user)

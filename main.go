@@ -19,5 +19,19 @@ func main() {
 	initialize.Redis()     // 初始化redis数据库
 	initialize.GormMysql() // 初始化mysql
 
+	//TestFollowDao_GetFollowList()
 	core.RunWindowsServer()
+
 }
+
+//func TestFollowDao_GetFollowList() {
+//	var followDao repository.FollowDao
+//	list, err := followDao.GetFollowList(1)
+//	if err != nil {
+//		fmt.Errorf(err.Error())
+//	}
+//
+//	for _, user := range list.UserList {
+//		fmt.Println(user)
+//	}
+//}

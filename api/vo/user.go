@@ -20,10 +20,10 @@ type UserResponseVo struct {
 }
 
 type UserInfoResponseVo struct {
-	User *userInfo `json:"user" binding:"required"`
+	User *UserInfo `json:"user" binding:"required"`
 }
 
-type userInfo struct {
+type UserInfo struct {
 	Id            int64  `json:"id" binding:"required"`
 	Name          string `json:"name" binding:"required"`
 	FollowCount   int64  `json:"follow_count" binding:"required"`
