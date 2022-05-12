@@ -8,10 +8,10 @@ package bo
  * @Date: 2022/5/11 1:14
  */
 type UserInfoBo struct {
-	ID            int64
+	Id            int64
 	Name          string
-	FollowCount   int
-	FollowerCount int
+	FollowCount   int64
+	FollowerCount int64
 	Follow        bool
 }
 
@@ -20,6 +20,16 @@ type UserBo struct {
 	Pwd  string
 }
 
+type UserRegisterBo struct {
+	Id    int64
+	Token string
+}
+
 type UserLoginBo struct {
 	Id int64
+}
+
+type CheckUserInfoBo struct {
+	IsMyself bool `default:"false"`
+	UserId   int64
 }

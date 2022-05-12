@@ -4,8 +4,6 @@ import (
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"bytedance-douyin/utils"
-	"fmt"
 	"github.com/u2takey/go-utils/encrypt"
 	"sync"
 )
@@ -21,14 +19,14 @@ type UserService struct{}
 
 func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	userId := userInfo.UserId
-	token := userInfo.Token
-	isMyself, toId, err := utils.DoubleCheckToken(userId, token)
+	toId := userInfo.Claims.BaseClaims.Id
+
+	isMyself := userId == toId
+
 	userInfoBo := bo.UserInfoBo{}
-	if err != nil {
-		return userInfoBo, err
-	}
 
 	var userModel model.UserDao
+	var err error
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 	go func() {
@@ -44,7 +42,6 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 		}
 		// todo 查询是否是粉丝
 		//FollowS
-		fmt.Println(toId)
 	}()
 
 	wg.Wait()
@@ -53,8 +50,10 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 		return userInfoBo, err
 	}
 
-	userInfoBo.ID = userModel.ID
+	userInfoBo.Id = userModel.ID
 	userInfoBo.Name = userModel.Name
+	userInfoBo.FollowCount = 0
+	userInfoBo.FollowerCount = 0
 	//  TODO 相关接口待实现
 	//userInfoBo.FollowCount = userModel.FollowCount
 	//userInfoBo.FollowerCount = userModel.FollowerCount
@@ -62,18 +61,21 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	return userInfoBo, nil
 }
 
-func (UserService) RegisterUser(user vo.UserVo) (userId int64) {
+func (UserService) RegisterUser(user vo.UserVo) (bo.UserRegisterBo, error) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
 	userBo.Pwd = encrypt.Md5([]byte(user.Password))
-	userId = userDao.RegisterUser(userBo)
-	return
+	urb, err := userDao.RegisterUser(userBo)
+	if err != nil {
+		return urb, err
+	}
+	return urb, nil
 }
 
 func (UserService) LoginUser(user vo.UserVo) (userId int64) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
 	userBo.Pwd = encrypt.Md5([]byte(user.Password))
-	userId = userDao.LoginUser(userBo)
+	userId = userDao.QueryUserByNameAndPassword(userBo)
 	return
 }

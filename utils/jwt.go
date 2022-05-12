@@ -6,9 +6,7 @@ import (
 	"context"
 	"errors"
 	"github.com/golang-jwt/jwt"
-	"github.com/tidwall/gjson"
-	"strconv"
-	"sync"
+	jsoniter "github.com/json-iterator/go"
 	"time"
 )
 
@@ -29,7 +27,6 @@ var (
 	TokenNotValidYet = errors.New("Token not active yet")
 	TokenMalformed   = errors.New("That's not even a token")
 	TokenInvalid     = errors.New("Couldn't handle this token:")
-	EXPIRE_TIME      = global.GVA_CONFIG.JWT.ExpiresTime
 )
 
 func NewJWT() *JWT {
@@ -83,6 +80,23 @@ func (j *JWT) ParseToken(tokenStr string) (*vo.CustomClaims, error) {
 	}
 }
 
+func (j JWT) ParseTokenRedis(token string) (*vo.CustomClaims, error) {
+	r, err := global.GVA_REDIS.Get(context.Background(), token).Result()
+	if err == nil {
+		var cc vo.CustomClaims
+		err := jsoniter.Unmarshal([]byte(r), &cc)
+		if err != nil {
+			return nil, err
+		}
+		return &cc, nil
+	}
+	cc, err := j.ParseToken(token)
+	if err != nil {
+		return nil, err
+	}
+	return cc, nil
+}
+
 func GenerateAndSaveToken(claims vo.BaseClaims) (string, error) {
 	myJwt := NewJWT()
 	customClaim := myJwt.CreateClaims(claims)
@@ -91,41 +105,9 @@ func GenerateAndSaveToken(claims vo.BaseClaims) (string, error) {
 		return "", err
 	}
 
-	if err := global.GVA_REDIS.SetEX(context.Background(), token, claims, time.Duration(EXPIRE_TIME)).Err(); err != nil {
+	et := global.GVA_CONFIG.JWT.ExpiresTime
+	if err := global.GVA_REDIS.SetEX(context.Background(), token, &customClaim, time.Duration(et)*time.Second).Err(); err != nil {
 		return "", err
 	}
 	return token, nil
-}
-
-func DoubleCheckToken(userId int64, token string) (bool, int64, error) {
-	myJwt := NewJWT()
-	var err error
-	var r string
-	var cc *vo.CustomClaims
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		cc, err = myJwt.ParseToken(token)
-	}()
-
-	go func() {
-		defer wg.Done()
-		r, err = global.GVA_REDIS.Get(context.Background(), token).Result()
-	}()
-
-	wg.Wait()
-	if err != nil {
-		return false, 0, err
-	}
-
-	ui, err := strconv.ParseInt(gjson.Get(r, "id").String(), 10, 0)
-	if err != nil {
-		return false, 0, err
-	}
-	if userId == cc.BaseClaims.Id && userId == ui {
-		return true, userId, nil
-	}
-	return false, ui, nil
 }

@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,14 +29,15 @@ func JWTAuth() gin.HandlerFunc {
 		}
 		// 解析token
 		j := utils.NewJWT()
-		claims, err := j.ParseToken(token)
+		//claims, err := j.ParseToken(token)
+		claims, err := j.ParseTokenRedis(token)
 		if err != nil {
 			if err == utils.TokenExpired {
 				response.FailWithMessage(c, LOGIN_EXPIRED)
 				c.Abort()
 				return
 			}
-			response.FailWithMessage(c, err.Error())
+			response.FailWithMessage(c, fmt.Sprintf("%s", err.Error()))
 			c.Abort()
 			return
 		}

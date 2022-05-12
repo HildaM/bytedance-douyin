@@ -19,7 +19,7 @@ func (u *UserRouter) InitBaseUserRouter(Router *gin.RouterGroup) {
 	baseUserRouter := Router.Group("user")
 	userApi := api.GroupApp.UserApi
 	{
-		baseUserRouter.POST("login", userApi.Login)
+		baseUserRouter.POST("login/", userApi.Login)
 		baseUserRouter.POST("register/", userApi.Register)
 	}
 }
@@ -28,6 +28,6 @@ func (u *UserRouter) InitUserInfoRouter(Router *gin.RouterGroup) {
 	baseUserRouter := Router.Group("user")
 	userApi := api.GroupApp.UserApi
 	{
-		baseUserRouter.GET("", userApi.UserInfo)
+		baseUserRouter.GET("/", userApi.UserInfo)
 	}
 }
