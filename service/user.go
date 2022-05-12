@@ -41,8 +41,14 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 			userInfoBo.Follow = false
 			return
 		}
-		// todo 查询是否是粉丝
-		//FollowS
+
+		// use follow service judge whether I followed him
+		var count int64
+		count, err = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: userId, ToUserId: toId})
+		if count != 0 {
+			userInfoBo.Follow = true
+		}
+
 	}()
 
 	wg.Wait()
@@ -53,12 +59,11 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 
 	userInfoBo.Id = userModel.ID
 	userInfoBo.Name = userModel.Name
-	userInfoBo.FollowCount = 0
-	userInfoBo.FollowerCount = 0
+	userInfoBo.FollowCount = userModel.FollowCount
+	userInfoBo.FollowerCount = userModel.FollowerCount
 	//  TODO 相关接口待实现
 	//userInfoBo.FollowCount = userModel.FollowCount
 	//userInfoBo.FollowerCount = userModel.FollowerCount
-	userInfoBo.Follow = false
 	return userInfoBo, nil
 }
 
