@@ -24,4 +24,5 @@ var GroupApp Group
 var (
 	userService   = service.GroupApp.UserService
 	followService = service.GroupApp.FollowService
+	commentService = service.GroupApp.CommentService
 )

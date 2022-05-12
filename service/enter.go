@@ -12,6 +12,7 @@ import "bytedance-douyin/repository"
 type Group struct {
 	UserService   UserService
 	FollowService FollowService
+	CommentService CommentService
 }
 
 var GroupApp Group
@@ -19,4 +20,5 @@ var GroupApp Group
 // repository
 var (
 	userDao = repository.GroupApp.UserDao
+	commentDao = repository.GroupApp.CommentDao
 )

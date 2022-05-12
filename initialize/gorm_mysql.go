@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"bytedance-douyin/global"
+	"bytedance-douyin/initialize/internal"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -12,7 +13,7 @@ func GormMysql() {
 		DSN:                       m.Dsn(),
 		SkipInitializeWithVersion: false,
 	}
-	if gormMysql, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{}); err == nil {
+	if gormMysql, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config()); err == nil {
 		db, _ := gormMysql.DB()
 		db.SetMaxIdleConns(m.MaxIdleConns)
 		db.SetMaxOpenConns(m.MaxOpenConns)
