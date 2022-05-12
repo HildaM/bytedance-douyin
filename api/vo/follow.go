@@ -1,6 +1,6 @@
 package vo
 
-// 关注
+// FollowVo 关注
 type FollowVo struct {
 	UserId     int64  `form:"user_id" binding:"required"`
 	Token      string `form:"token" binding:"required"`
@@ -8,13 +8,13 @@ type FollowVo struct {
 	ActionType string `form:"action_type" binding:"required,oneof=1 2"`
 }
 
-// 关注列表
+// FollowListVo 关注列表
 type FollowListVo struct {
 	UserId int64  `form:"user_id" binding:"required"`
 	Token  string `form:"token" binding:"required"`
 }
 
-// 粉丝列表
+// FollowerListVo 粉丝列表
 type FollowerListVo struct {
 	UserId int64  `form:"user_id" binding:"required"`
 	Token  string `form:"token" binding:"required"`

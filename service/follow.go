@@ -12,8 +12,7 @@ import (
 type FollowService struct{}
 type FollowerService struct{}
 
-//
-//  GetFollowList
+// GetFollowList
 //  @Description: 获取关注的用户列表
 //  @receiver FollowService
 //  @param userInfo
