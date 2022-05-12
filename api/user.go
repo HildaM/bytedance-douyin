@@ -39,6 +39,8 @@ func (UserApi) Login(c *gin.Context) {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 	userId := userService.LoginUser(userLogin)
+	// BUG: userId在用户不存在的时候没有返回
+
 	bc := vo.BaseClaims{Id: userId, Name: userLogin.Username}
 	token, err := utils.GenerateAndSaveToken(bc)
 	if err != nil {
