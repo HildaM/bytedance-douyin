@@ -39,7 +39,7 @@ func (UserApi) Login(c *gin.Context) {
 		response.FailWithMessage(c, fmt.Sprintf("%s", err))
 	}
 	userId := userService.LoginUser(userLogin)
-	// BUG: userId在用户不存在的时候没有返回
+
 	if userId == 0 {
 		response.FailWithMessage(c, "用户名或密码错误！")
 		return

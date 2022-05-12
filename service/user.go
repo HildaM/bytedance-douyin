@@ -4,7 +4,6 @@ import (
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"fmt"
 	"github.com/u2takey/go-utils/encrypt"
 	"sync"
 )
@@ -43,7 +42,6 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 		}
 		// todo 查询是否是粉丝
 		//FollowS
-		fmt.Println(toId)
 	}()
 
 	wg.Wait()
