@@ -30,7 +30,7 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 		return followList, err
 	}
 
-	var userList []vo.UserInfo
+	var userList []*vo.UserInfo
 	for _, user := range users {
 		userInfo := vo.UserInfo{
 			Id:            user.ID,
@@ -40,7 +40,7 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 			IsFollow:      false,
 		}
 
-		userList = append(userList, userInfo)
+		userList = append(userList, &userInfo)
 	}
 	followList.UserList = userList
 

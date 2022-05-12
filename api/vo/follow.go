@@ -21,7 +21,7 @@ type FollowerListVo struct {
 }
 
 type FollowResponseVo struct {
-	UserList []UserInfo `json:"user_list" binding:"required"`
+	UserList []*UserInfo `json:"user_list" binding:"required"`
 }
 
 type FollowerResponseVo struct {

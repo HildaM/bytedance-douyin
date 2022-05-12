@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"bytedance-douyin/api/vo"
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
+	"bytedance-douyin/utils"
 )
 
 /**
@@ -31,15 +33,34 @@ func (UserDao) GetUsers(userIds []int64) ([]model.UserDao, error) {
 	return users, nil
 }
 
-func (UserDao) RegisterUser(userBo bo.UserBo) (userId int64) {
+func (UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
+	tx := global.GVA_DB.Begin()
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
-	global.GVA_DB.Create(&user)
-	userId = user.ID
-	return
+	var urb bo.UserRegisterBo
+	tx.Debug().Create(&user)
+	if tx.Error != nil {
+		tx.Rollback()
+		return urb, tx.Error
+	}
+	userId := user.ID
+
+	bc := vo.BaseClaims{Id: userId, Name: userBo.Name}
+	token, err := utils.GenerateAndSaveToken(bc)
+	if err != nil {
+		tx.Rollback()
+		return urb, err
+	}
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return urb, err
+	}
+	urb.Token = token
+	urb.Id = userId
+	return urb, nil
 }
 
-func (u *UserDao) LoginUser(userBo bo.UserBo) (userId int64) {
-	var userLoginBo bo.UserLoginBo
-	global.GVA_DB.Where("username = ? and password = ?", userBo.Name, userBo.Pwd).Find(&userLoginBo)
-	return userLoginBo.Id
+func (u *UserDao) QueryUserByNameAndPassword(userBo bo.UserBo) (userId int64) {
+	var user model.UserDao
+	global.GVA_DB.Where("name = ? and password = ?", userBo.Name, userBo.Pwd).Select("id").Find(&user)
+	return user.ID
 }
