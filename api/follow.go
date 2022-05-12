@@ -40,7 +40,7 @@ func (api *FollowApi) Follow(c *gin.Context) {
 
 //
 //  FollowList
-//  @Description:	获取粉丝列表
+//  @Description:	获取关注列表
 //  @receiver api
 //  @param c
 //	@Request body:	user_id, token
@@ -59,6 +59,23 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 	r.OkWithData(c, userList)
 }
 
+//
+//  FansList
+//  @Description: 	获取粉丝列表
+//  @receiver api
+//	@Request body:	user_id, token
+//  @param c
+//
 func (api *FollowApi) FansList(c *gin.Context) {
+	var userInfo vo.FollowerListVo
+	if err := c.ShouldBind(&userInfo); err != nil {
+		r.FailWithMessage(c, "参数校验失败")
+	}
 
+	fanList, err := followerService.GetFanList(userInfo)
+	if err != nil {
+		r.FailWithMessage(c, fmt.Sprintf("%s", err))
+	}
+
+	r.OkWithData(c, fanList)
 }

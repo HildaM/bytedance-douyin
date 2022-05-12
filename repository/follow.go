@@ -155,3 +155,92 @@ func (FollowDao) GetFollowCount(followInfo bo.FollowBo) (int64, error) {
 
 	return count, nil
 }
+
+// GetFanList
+func (FollowDao) GetFanList(userId int64) (vo.FollowerResponseVo, error) {
+	var fanList vo.FollowerResponseVo
+
+	// 1. to_user_id --> user_ids
+	userIdList, err := getUserIdList(userId)
+	if err != nil {
+		return fanList, err
+	}
+
+	// 2. user_ids --> user list
+	var userDao UserDao
+	users, err := userDao.GetUsers(userIdList)
+	if err != nil {
+		return fanList, err
+	}
+
+	var userList []*vo.UserInfo
+	for _, user := range users {
+		userInfo := vo.UserInfo{
+			Id:            user.ID,
+			Name:          user.Name,
+			FollowCount:   user.FollowCount,
+			FollowerCount: user.FollowerCount,
+			IsFollow:      false, // 暂时未知两人是否互相关注
+		}
+
+		userList = append(userList, &userInfo)
+	}
+
+	// 3. 检查user是否关注过自己的粉丝
+	if err = isFollowItsFans(&userList, userId); err != nil {
+		return fanList, nil
+	}
+
+	fanList.UserList = userList
+
+	return fanList, nil
+}
+
+func getUserIdList(userId int64) ([]int64, error) {
+	follows := []model.Follow{}
+	fanIds := []int64{}
+
+	// select user_id from t_follow where to_user_id = userId
+	if result := global.GVA_DB.Select("user_id").Where("to_user_id = ?", userId).Find(&follows); result.Error != nil {
+		return fanIds, result.Error
+	}
+
+	for _, follow := range follows {
+		fanIds = append(fanIds, follow.UserId)
+	}
+
+	return fanIds, nil
+}
+
+// isFollowItsFans 检查是否user关注过自己的粉丝
+func isFollowItsFans(fanList *[]*vo.UserInfo, userId int64) error {
+	//var followList vo.FollowResponseVo
+	followList, err := FollowDao{}.GetFollowList(userId)
+	if err != nil {
+		return err
+	}
+
+	// 只要自己的关注列表中有自己的粉丝，那么就是相互关注的
+	follows := followList.UserList
+	for _, follow := range follows {
+		for _, fan := range *fanList {
+			if fan.Name == follow.Name {
+				fan.IsFollow = true
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetFanCount 获取粉丝数目
+func (FollowDao) GetFanCount(followInfo bo.FollowBo) (int64, error) {
+	db := global.GVA_DB
+
+	var count int64
+	if err := db.Model(&model.Follow{}).Where("to_user_id = ?", followInfo.UserId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

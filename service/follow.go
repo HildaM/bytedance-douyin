@@ -23,7 +23,7 @@ func (FollowService) GetFollowList(userInfo vo.FollowListVo) (vo.FollowResponseV
 	var followedUserList vo.FollowResponseVo
 
 	//	根据user_id获取userList
-	var userId = userInfo.UserId
+	userId := userInfo.UserId
 	var err error
 	followedUserList, err = followDao.GetFollowList(userId)
 	if err != nil {
@@ -68,6 +68,37 @@ func (FollowService) GetFollowCount(followInfo vo.FollowVo) (int64, error) {
 	if err != nil {
 		global.GVA_LOG.Error(err.Error())
 		return 0, err
+	}
+
+	return count, nil
+}
+
+// GetFanList 获取粉丝列表
+func (FollowerService) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
+	var fanList vo.FollowerResponseVo
+	userId := userInfo.UserId
+	var err error
+
+	fanList, err = followDao.GetFanList(userId)
+	if err != nil {
+		global.GVA_LOG.Error(err.Error())
+		return fanList, err
+	}
+
+	return fanList, nil
+}
+
+// GetFanCount 获取粉丝数
+func (FollowerService) GetFanCount(followInfo vo.FollowVo) (int64, error) {
+	followBo := bo.FollowBo{
+		UserId:   followInfo.UserId,
+		ToUserId: followInfo.ToUserId,
+	}
+
+	count, err := followDao.GetFanCount(followBo)
+	if err != nil {
+		global.GVA_LOG.Error(err.Error())
+		return count, err
 	}
 
 	return count, nil

@@ -10,8 +10,9 @@ import "bytedance-douyin/repository"
  * @Date: 2022/5/11 0:17
  */
 type Group struct {
-	UserService   UserService
-	FollowService FollowService
+	UserService     UserService
+	FollowService   FollowService
+	FollowerService FollowerService
 }
 
 var GroupApp Group
