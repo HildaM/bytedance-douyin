@@ -17,6 +17,7 @@ import (
  */
 type UserService struct{}
 
+// GetUserInfo get user information
 func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	userId := userInfo.UserId
 	toId := userInfo.Claims.BaseClaims.Id

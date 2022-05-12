@@ -144,7 +144,7 @@ func unFollowUser(followInfo bo.FollowBo) error {
 	return nil
 }
 
-// GetFollowCount
+// GetFollowCount judge user is following another one
 func (FollowDao) GetFollowCount(followInfo bo.FollowBo) (int64, error) {
 	db := global.GVA_DB
 
