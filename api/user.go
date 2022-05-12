@@ -40,6 +40,10 @@ func (UserApi) Login(c *gin.Context) {
 	}
 	userId := userService.LoginUser(userLogin)
 	// BUG: userId在用户不存在的时候没有返回
+	if userId == 0 {
+		response.FailWithMessage(c, "用户名或密码错误！")
+		return
+	}
 
 	bc := vo.BaseClaims{Id: userId, Name: userLogin.Username}
 	token, err := utils.GenerateAndSaveToken(bc)
@@ -68,13 +72,5 @@ func (api *UserApi) UserInfo(c *gin.Context) {
 
 	data := vo.UserInfoResponseVo{User: u}
 	response.OkWithData(c, data)
-	//userId, _ := strconv.Atoi(c.Query("user_id"))
-	//userBO, _ := userService.GetUserInfo(userId)
-	//userVO := &vo.UserInfo{}
-	//userVO.Id = userBO.ID
-	//userVO.Name = userBO.Name
-	//userVO.FollowerCount = userBO.FollowerCount
-	//userVO.FollowCount = userBO.FollowCount
-	//userVO.Follow = userBO.Follow
-	//response.OkWithData(c, data.UserInfo{User: userVO})
+
 }

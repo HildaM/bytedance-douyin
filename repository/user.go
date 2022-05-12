@@ -51,7 +51,7 @@ func (UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 	return urb, nil
 }
 
-func (u *UserDao) LoginUser(userBo bo.UserBo) (userId int64) {
+func (u *UserDao) QueryUserByNameAndPassword(userBo bo.UserBo) (userId int64) {
 	var userLoginBo bo.UserLoginBo
 	global.GVA_DB.Where("username = ? and password = ?", userBo.Name, userBo.Pwd).Find(&userLoginBo)
 	return userLoginBo.Id

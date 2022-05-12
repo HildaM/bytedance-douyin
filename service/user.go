@@ -78,6 +78,6 @@ func (UserService) LoginUser(user vo.UserVo) (userId int64) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
 	userBo.Pwd = encrypt.Md5([]byte(user.Password))
-	userId = userDao.LoginUser(userBo)
+	userId = userDao.QueryUserByNameAndPassword(userBo)
 	return
 }
