@@ -4,7 +4,7 @@ package vo
 type FollowVo struct {
 	UserId     int64  `form:"user_id" binding:"required"`
 	Token      string `form:"token" binding:"required"`
-	ToUserId   string `form:"to_user_id" binding:"required"`
+	ToUserId   int64  `form:"to_user_id" binding:"required"`
 	ActionType string `form:"action_type" binding:"required,oneof=1 2"`
 }
 

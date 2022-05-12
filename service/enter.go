@@ -18,5 +18,6 @@ var GroupApp Group
 
 // repository
 var (
-	userDao = repository.GroupApp.UserDao
+	userDao   = repository.GroupApp.UserDao
+	followDao = repository.GroupApp.FollowDao
 )
