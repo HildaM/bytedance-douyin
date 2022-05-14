@@ -25,9 +25,9 @@ func (UserDao) GetUser(userId int64) (model.UserDao, error) {
 	}
 	return user, nil
 }
-func (UserDao) GetUserByName(name string) ([]*UserDao, error) {
-	users := make([]*UserDao, 0)
-	if err := global.GVA_DB.Where("name = ?", name).Find(users).Error; err != nil {
+func (UserDao) GetUserByName(name string) ([]*model.UserDao, error) {
+	users := make([]*model.UserDao, 0)
+	if err := global.GVA_DB.Where("name = ?", name).Find(&users).Error; err != nil {
 		return users, err
 	}
 	return users, nil
