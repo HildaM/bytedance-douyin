@@ -5,6 +5,8 @@ import (
 	"bytedance-douyin/initialize"
 	"go.uber.org/zap"
 	"net/http"
+	_ "net/http/pprof"
+	"runtime"
 	"time"
 )
 
@@ -21,6 +23,9 @@ type server interface {
 
 func RunWindowsServer() {
 
+	// 引入pprof
+	initPprof()
+
 	Router := initialize.Routers()
 	Router.Static("/form-generator", "./resource/page")
 
@@ -35,4 +40,19 @@ func RunWindowsServer() {
 	global.GVA_LOG.Info("server run success on ", zap.String("address", "127.0.0.1"))
 
 	global.GVA_LOG.Error(s.ListenAndServe().Error())
+
+}
+
+func initPprof() {
+	runtime.SetMutexProfileFraction(1) // 开启对锁调用的跟踪
+	runtime.SetBlockProfileRate(1)     // 开启对阻塞操作的跟踪
+
+	// 引入pprof
+	go func() {
+		// 启动一个 http server，注意 pprof 相关的 handler 已经自动注册过了
+		global.GVA_LOG.Info("Starting pprof to monitor this server")
+		if err := http.ListenAndServe(":6060", nil); err != nil {
+			global.GVA_LOG.Error(err.Error())
+		}
+	}()
 }

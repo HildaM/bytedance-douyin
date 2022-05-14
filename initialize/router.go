@@ -34,6 +34,7 @@ func Routers() *gin.Engine {
 	// Router.Use(middleware.Cors()) // 直接放行全部跨域请求
 	//Router.Use(middleware.CorsByRules()) // 按照配置的规则放行跨域请求
 	global.GVA_LOG.Info("use middleware cors")
+
 	// 方便统一添加路由组前缀 多服务器上线使用
 	PublicGroup := Router.Group("douyin")
 	{
