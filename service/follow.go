@@ -12,6 +12,11 @@ import (
 type FollowService struct{}
 type FollowerService struct{}
 
+const (
+	FOLLOW   = 1
+	UNFOLLOW = 2
+)
+
 // GetFollowList
 //  @Description: 获取关注的用户列表
 //  @receiver FollowService
@@ -43,9 +48,9 @@ func (FollowService) FollowOrNot(followInfo vo.FollowVo) (int8, error) {
 	var err error
 	action := followInfo.ActionType
 	switch action {
-	case 1:
+	case FOLLOW:
 		err = followDao.FollowUser(followBo)
-	case 2:
+	case UNFOLLOW:
 		err = followDao.UnFollowUser(followBo)
 	}
 	if err != nil {
