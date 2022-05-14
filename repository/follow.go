@@ -9,14 +9,15 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
+	"bytedance-douyin/utils"
 	"errors"
 	"reflect"
 )
 
 type FollowDao struct{}
 
-// GetFollowList get Follow List
-func (dao FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
+// GetFollowList Abandon
+func (dao FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 
 	//	1. userId --> to_userId list
@@ -51,7 +52,7 @@ func (dao FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 }
 
 // GetFollowList2 pass
-func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
+func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 	var follows []*vo.UserInfo
 
@@ -176,17 +177,26 @@ func (FollowDao) GetFollowCount(followInfo bo.FollowBo) (int64, error) {
 }
 
 // GetFanList 获取粉丝列表
-func (FollowDao) GetFanList(userId int64) (vo.FollowerResponseVo, error) {
+func (FollowDao) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
 	var fansList vo.FollowerResponseVo
 	var fans []*vo.UserInfo
 
-	err := global.GVA_DB.Raw(
+	userId := userInfo.UserId
+
+	j := utils.NewJWT()
+	claims, err := j.ParseToken(userInfo.Token)
+	if err != nil {
+		return fansList, err
+	}
+	tokenId := claims.BaseClaims.Id
+
+	err = global.GVA_DB.Raw(
 		"SELECT a.user_id as id, u.name, u.follow_count, u.follower_count,"+
 			"CASE WHEN a.user_id = b.to_user_id THEN true ELSE false END as `is_follow`"+
 			"FROM (SELECT user_id FROM t_follow f WHERE f.to_user_id = ? AND f.deleted_at is NULL) a"+
 			"	LEFT JOIN t_follow b ON b.user_id = ? AND a.user_id = b.to_user_id AND b.deleted_at is NULL"+
 			"	LEFT JOIN t_user u ON u.id = a.user_id",
-		userId, userId,
+		userId, tokenId,
 	).Scan(&fans).Error
 	if err != nil {
 		return fansList, err

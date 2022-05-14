@@ -80,10 +80,9 @@ func (FollowService) GetFollowCount(followInfo vo.FollowVo) (int64, error) {
 // GetFanList 获取粉丝列表
 func (FollowerService) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
 	var fanList vo.FollowerResponseVo
-	userId := userInfo.UserId
 	var err error
 
-	fanList, err = followDao.GetFanList(userId)
+	fanList, err = followDao.GetFanList(userInfo)
 	if err != nil {
 		global.GVA_LOG.Error(err.Error())
 		return fanList, err
