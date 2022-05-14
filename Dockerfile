@@ -8,7 +8,7 @@ ADD . ./
 ENV GO111MODULE=on
 ENV GOPROXY="https://goproxy.io"
 # 指定编译完成后的文件名，可以不设置使用默认的，最后一步要执行该文件名
-RUN go build -o gin_docker .
+RUN go build -o douyin .
 EXPOSE 8080
 # 这里跟编译完的文件名一致
-ENTRYPOINT  ["./gin_docker"]
+ENTRYPOINT  ["./douyin"]
