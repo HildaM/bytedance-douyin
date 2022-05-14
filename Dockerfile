@@ -1,7 +1,7 @@
 FROM golang:alpine
 
 # docker中的工作目录
-WORKDIR $GOPATH/src/gin_docker
+WORKDIR $GOPATH/src/douyin
 # 将当前目录同步到docker工作目录下，也可以只配置需要的目录和文件（配置目录、编译后的程序等）
 ADD . ./
 # 由于所周知的原因，某些包会出现下载超时。这里在docker里也使用go module的代理服务
