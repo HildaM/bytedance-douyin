@@ -20,6 +20,7 @@ func (UserApi) Register(c *gin.Context) {
 	var userRegister vo.UserVo
 	if err := c.ShouldBind(&userRegister); err != nil {
 		response.FailWithMessage(c, err.Error())
+		return
 	}
 
 	urb, err := userService.RegisterUser(userRegister)
@@ -36,10 +37,12 @@ func (UserApi) Login(c *gin.Context) {
 	var userLogin vo.UserVo
 	if err := c.ShouldBind(&userLogin); err != nil {
 		response.FailWithMessage(c, err.Error())
+		return
 	}
 	userId, err := userService.LoginUser(userLogin)
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
+		return
 	}
 
 	bc := vo.BaseClaims{Id: userId, Name: userLogin.Username}
