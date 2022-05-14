@@ -57,10 +57,17 @@ func (UserApi) Login(c *gin.Context) {
 
 func (api *UserApi) UserInfo(c *gin.Context) {
 	var userInfo vo.UserInfoVo
+
 	if err := c.ShouldBind(&userInfo); err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
+
+	// 一定要拿到，否则panic
+	claim := c.MustGet("claims")
+
+	claims := claim.(vo.BaseClaims)
+	userInfo.MyUserId = claims.Id
 	//token := userInfo.Token
 	info, err := userService.GetUserInfo(userInfo)
 	if err != nil {

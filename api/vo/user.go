@@ -11,11 +11,10 @@ type UserVo struct {
 	Password string `form:"password" binding:"required,max=32"`
 }
 
-// 用户信息
+// UserInfoVo 用户信息
 type UserInfoVo struct {
-	UserId int64        `form:"user_id" binding:"required"`
-	Token  string       `form:"token" binding:"required"`
-	Claims CustomClaims `form:"claims" binding:"required"`
+	UserId   int64 `form:"user_id" binding:"required"`
+	MyUserId int64
 }
 
 type UserResponseVo struct {

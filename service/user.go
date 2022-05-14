@@ -20,7 +20,7 @@ type UserService struct{}
 // GetUserInfo get user information
 func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	userId := userInfo.UserId
-	myId := userInfo.Claims.BaseClaims.Id
+	myId := userInfo.MyUserId
 
 	// judge whether me
 	isMyself := userId == myId
