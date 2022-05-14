@@ -1,11 +1,13 @@
 # bytedance-douyin
 
 ## 项目结构
+```
 ├─api                   控制层
 │  ├─response           仅存放一个response响应工具
 │  └─vo                 控制层与客户端互相传递的对象，分为vo与response vo
 ├─config                项目中的配置结构体，与resource/config.yaml对应。
 ├─core                  全局配置，很少用。
+├─exceptions            自定义error
 ├─global                全局资源，redis、db连接等
 ├─initialize            初始化各类工具
 ├─log                   日志（不提交git）
@@ -18,7 +20,7 @@
 │  └─bo                 service层传给controller层的对象
 ├─test                  测试文件
 └─utils                 工具类
-
+```
 // 持久化层到客户端的数据封装。由于部分业务简单，灵活变通吧。
 // 大多数情况下vo、bo、model其实都长得差不多，可以通过json的tag屏蔽掉一些敏感信息。
 
