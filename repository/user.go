@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
@@ -24,6 +25,13 @@ func (UserDao) GetUser(userId int64) (model.UserDao, error) {
 	}
 	return user, nil
 }
+func (UserDao) GetUserByName(name string) ([]*UserDao, error) {
+	users := make([]*UserDao, 0)
+	if err := global.GVA_DB.Where("name = ?", name).Find(users).Error; err != nil {
+		return users, err
+	}
+	return users, nil
+}
 
 func (UserDao) GetUsers(userIds []int64) ([]model.UserDao, error) {
 	var users []model.UserDao
@@ -33,10 +41,16 @@ func (UserDao) GetUsers(userIds []int64) ([]model.UserDao, error) {
 	return users, nil
 }
 
-func (UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
+func (u UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 	tx := global.GVA_DB.Begin()
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
 	var urb bo.UserRegisterBo
+	// 判断用户名是否已存在
+	users, err := u.GetUserByName(userBo.Name)
+	if len(users) != 0 {
+		return urb, exceptions.RegisterError
+	}
+	// 不存在，创建用户
 	tx.Debug().Create(&user)
 	if tx.Error != nil {
 		tx.Rollback()
@@ -45,6 +59,7 @@ func (UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 	userId := user.ID
 
 	bc := vo.BaseClaims{Id: userId, Name: userBo.Name}
+	// 生成token
 	token, err := utils.GenerateAndSaveToken(bc)
 	if err != nil {
 		tx.Rollback()
@@ -59,8 +74,17 @@ func (UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 	return urb, nil
 }
 
-func (UserDao) QueryUserByNameAndPassword(userBo bo.UserBo) (userId int64) {
+func (UserDao) QueryUserByNameAndPassword(userBo bo.UserBo) (int64, error) {
 	var user model.UserDao
-	global.GVA_DB.Where("name = ? and password = ?", userBo.Name, userBo.Pwd).Select("id").Find(&user)
-	return user.ID
+	err := global.GVA_DB.
+		Where("name = ? and password = ?", userBo.Name, userBo.Pwd).
+		Select("id").
+		Find(&user).Error
+	if err != nil {
+		return 0, err
+	}
+	if user.ID == 0 {
+		return 0, exceptions.LoginError
+	}
+	return user.ID, nil
 }

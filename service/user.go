@@ -78,10 +78,13 @@ func (UserService) RegisterUser(user vo.UserVo) (bo.UserRegisterBo, error) {
 	return urb, nil
 }
 
-func (UserService) LoginUser(user vo.UserVo) (userId int64) {
+func (UserService) LoginUser(user vo.UserVo) (int64, error) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
 	userBo.Pwd = encrypt.Md5([]byte(user.Password))
-	userId = userDao.QueryUserByNameAndPassword(userBo)
-	return
+	userId, err := userDao.QueryUserByNameAndPassword(userBo)
+	if err != nil {
+		return userId, err
+	}
+	return userId, nil
 }

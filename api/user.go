@@ -20,12 +20,12 @@ type UserApi struct{}
 func (UserApi) Register(c *gin.Context) {
 	var userRegister vo.UserVo
 	if err := c.ShouldBind(&userRegister); err != nil {
-		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		response.FailWithMessage(c, err.Error())
 	}
 
 	urb, err := userService.RegisterUser(userRegister)
 	if err != nil {
-		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		response.FailWithMessage(c, err.Error())
 		return
 	}
 
@@ -36,19 +36,17 @@ func (UserApi) Register(c *gin.Context) {
 func (UserApi) Login(c *gin.Context) {
 	var userLogin vo.UserVo
 	if err := c.ShouldBind(&userLogin); err != nil {
-		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		response.FailWithMessage(c, err.Error())
 	}
-	userId := userService.LoginUser(userLogin)
-
-	if userId == 0 {
-		response.FailWithMessage(c, "用户名或密码错误！")
-		return
+	userId, err := userService.LoginUser(userLogin)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
 	}
 
 	bc := vo.BaseClaims{Id: userId, Name: userLogin.Username}
 	token, err := utils.GenerateAndSaveToken(bc)
 	if err != nil {
-		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		response.FailWithMessage(c, err.Error())
 		return
 	}
 	urv := vo.UserResponseVo{UserId: userId, Token: token}
