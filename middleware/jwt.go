@@ -2,14 +2,9 @@ package middleware
 
 import (
 	"bytedance-douyin/api/response"
+	"bytedance-douyin/exceptions"
 	"bytedance-douyin/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
-)
-
-const (
-	REJECT_REQUEST = "拒绝访问"
-	LOGIN_EXPIRED  = "登录状态已过期"
 )
 
 func JWTAuth() gin.HandlerFunc {
@@ -28,7 +23,7 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 		if token == "" {
-			response.FailWithMessage(c, REJECT_REQUEST)
+			response.FailWithMessage(c, exceptions.RejectRequestError.Error())
 			c.Abort()
 			return
 		}
@@ -38,11 +33,11 @@ func JWTAuth() gin.HandlerFunc {
 		claims, err := j.ParseTokenRedis(token)
 		if err != nil {
 			if err == utils.TokenExpired {
-				response.FailWithMessage(c, LOGIN_EXPIRED)
+				response.FailWithMessage(c, exceptions.LoginExpired.Error())
 				c.Abort()
 				return
 			}
-			response.FailWithMessage(c, fmt.Sprintf("%s", err.Error()))
+			response.FailWithMessage(c, err.Error())
 			c.Abort()
 			return
 		}

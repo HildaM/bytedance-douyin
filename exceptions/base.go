@@ -1,11 +1,11 @@
 package exceptions
 
 type Error struct {
-	ErrMsg string
+	errMsg string
 }
 
 func (e Error) Error() string {
-	return e.ErrMsg
+	return e.errMsg
 }
 
 func NewErr(msg string) Error {

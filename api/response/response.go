@@ -1,7 +1,7 @@
 package response
 
 import (
-	"fmt"
+	"bytedance-douyin/global"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -29,10 +29,12 @@ type BasicResponse struct {
 }
 
 func withDetailed(c *gin.Context, code int8, message string, data interface{}) {
-	m, err := struct2Map(&BasicResponse{StatusCode: code, StatusMessage: message, Data: data})
+	m := struct2Map(&BasicResponse{StatusCode: code, StatusMessage: message, Data: data})
 
-	if err != nil {
-		_ = fmt.Errorf("%w", err)
+	if code != SUCCESS {
+		go func() {
+			global.GVA_LOG.Error(message)
+		}()
 	}
 
 	c.JSON(http.StatusOK, m)
@@ -70,15 +72,12 @@ func FailWithDetailed(c *gin.Context, message string, data interface{}) {
 	withDetailed(c, ERROR, message, data)
 }
 
-func struct2Map(in interface{}) (map[string]interface{}, error) {
+func struct2Map(in interface{}) map[string]interface{} {
 
 	// 当前函数只接收struct类型
 	v := reflect.ValueOf(in)
 	if v.Kind() == reflect.Ptr { // 结构体指针
 		v = v.Elem()
-	}
-	if v.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("ToMap only accepts struct or struct pointer; got %T", v)
 	}
 
 	out := make(map[string]interface{}, 8)
@@ -106,5 +105,5 @@ func struct2Map(in interface{}) (map[string]interface{}, error) {
 			}
 		}
 	}
-	return out, nil
+	return out
 }
