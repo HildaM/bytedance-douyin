@@ -8,13 +8,12 @@ import (
 	"sync"
 )
 
+// UserService
 /**
- * @Author: 1999single
- * @Description:
- * @File: user
- * @Version: 1.0.0
- * @Date: 2022/5/11 0:18
- */
+获取用户信息，登录、注册 service层
+@author: charon
+@date:   2022-5-14 last update
+*/
 type UserService struct{}
 
 // GetUserInfo get user information

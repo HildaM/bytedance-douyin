@@ -11,13 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserDao
 /**
- * @Author: 1999single
- * @Description:
- * @File: user
- * @Version: 1.0.0
- * @Date: 2022/5/11 0:37
- */
+获取用户信息，登录、注册 dao层
+@author: charon
+@date:   2022-5-14 last update
+*/
 type UserDao struct{}
 
 func (UserDao) GetUser(userId int64) (model.UserDao, error) {
