@@ -7,13 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UserApi
 /**
- * @Author: 1999single
- * @Description: 用户登陆、注册、查看信息
- * @File: user
- * @Version: 1.0.0
- * @Date: 2022/5/6 17:54
- */
+用户注册、登录、获取用户信息接口
+@author: charon
+@date:   2022-5-14 last update
+*/
 type UserApi struct{}
 
 func (UserApi) Register(c *gin.Context) {
