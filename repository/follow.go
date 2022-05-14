@@ -197,8 +197,8 @@ func (FollowDao) GetFanList(userId int64) (vo.FollowerResponseVo, error) {
 }
 
 func getUserIdList(userId int64) ([]int64, error) {
-	follows := []model.Follow{}
-	fanIds := []int64{}
+	var follows []model.Follow
+	var fanIds []int64
 
 	// select user_id from t_follow where to_user_id = userId
 	if result := global.GVA_DB.Select("user_id").Where("to_user_id = ?", userId).Find(&follows); result.Error != nil {
