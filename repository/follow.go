@@ -50,6 +50,25 @@ func (dao FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	return followList, nil
 }
 
+// GetFollowList
+func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
+	var followList vo.FollowResponseVo
+	var follows []*vo.UserInfo
+
+	err := global.GVA_DB.Raw(
+		"SELECT a.to_user_id as id, u.name, u.follow_count, u.follower_count, true as `is_follow`"+
+			"FROM (SELECT to_user_id FROM t_follow f WHERE f.user_id = ? and f.deleted_at IS NULL) a"+
+			"		LEFT JOIN t_user u ON u.id = a.to_user_id",
+		userId,
+	).Scan(&follows).Error
+	if err != nil {
+		return followList, err
+	}
+
+	followList.UserList = follows
+	return followList, nil
+}
+
 //  getToUserIdList use userId to find to_user_id list
 func (FollowDao) GetToUserIdList(userId int64) ([]int64, error) {
 	var follows []model.Follow
