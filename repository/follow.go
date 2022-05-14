@@ -50,7 +50,7 @@ func (dao FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	return followList, nil
 }
 
-// GetFollowList
+// GetFollowList2 pass
 func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 	var follows []*vo.UserInfo
@@ -69,7 +69,7 @@ func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	return followList, nil
 }
 
-//  getToUserIdList use userId to find to_user_id list
+// GetToUserIdList use userId to find to_user_id list
 func (FollowDao) GetToUserIdList(userId int64) ([]int64, error) {
 	var follows []model.Follow
 	var toUserIdList []int64
