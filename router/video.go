@@ -18,7 +18,7 @@ func (v *VideoRouter) InitVideoFeedRouter(Router *gin.RouterGroup) {
 	router := Router.Group("feed")
 	videoApi := api.GroupApp.VideoApi
 	{
-		router.GET("", videoApi.VideoFeed)
+		router.GET("/", videoApi.VideoFeed)
 	}
 }
 
