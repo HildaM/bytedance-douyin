@@ -7,6 +7,8 @@ import (
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
 	"bytedance-douyin/utils"
+	"errors"
+	"gorm.io/gorm"
 )
 
 /**
@@ -25,12 +27,17 @@ func (UserDao) GetUser(userId int64) (model.UserDao, error) {
 	}
 	return user, nil
 }
-func (UserDao) GetUserByName(name string) ([]*model.UserDao, error) {
-	users := make([]*model.UserDao, 0)
-	if err := global.GVA_DB.Where("name = ?", name).Find(&users).Error; err != nil {
-		return users, err
+func (UserDao) GetUserByName(name string) error {
+	var user model.UserDao
+	err := global.GVA_DB.Where("name = ?", name).First(&user).Error
+	// 没有该条记录
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	} else if err != nil {
+		return err
 	}
-	return users, nil
+	// 有该条记录
+	return exceptions.UserExistError
 }
 
 func (UserDao) GetUsers(userIds []int64) ([]model.UserDao, error) {
@@ -46,10 +53,11 @@ func (u UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
 	var urb bo.UserRegisterBo
 	// 判断用户名是否已存在
-	users, err := u.GetUserByName(userBo.Name)
-	if len(users) != 0 {
-		return urb, exceptions.RegisterError
+	err := u.GetUserByName(userBo.Name)
+	if err != nil {
+		return urb, err
 	}
+
 	// 不存在，创建用户
 	tx.Debug().Create(&user)
 	if tx.Error != nil {
