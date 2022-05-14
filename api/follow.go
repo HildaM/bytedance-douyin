@@ -23,13 +23,13 @@ func (api *FollowApi) Follow(c *gin.Context) {
 	}
 
 	var err error
-	var code string
+	var code int8
 	if code, err = followService.FollowOrNot(followInfo); err != nil {
 		r.FailWithMessage(c, err.Error())
 		return
 	}
-	action := func(code string) string {
-		if code == "1" {
+	action := func(code int8) string {
+		if code == 1 {
 			return "关注"
 		}
 		return "取消关注"

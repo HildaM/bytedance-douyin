@@ -33,7 +33,7 @@ func (FollowService) GetFollowList(userInfo vo.FollowListVo) (vo.FollowResponseV
 }
 
 // FollowOrNot 关注与取消关注
-func (FollowService) FollowOrNot(followInfo vo.FollowVo) (string, error) {
+func (FollowService) FollowOrNot(followInfo vo.FollowVo) (int8, error) {
 	followBo := bo.FollowBo{
 		UserId:   followInfo.UserId,
 		ToUserId: followInfo.ToUserId,
@@ -43,14 +43,14 @@ func (FollowService) FollowOrNot(followInfo vo.FollowVo) (string, error) {
 	var err error
 	action := followInfo.ActionType
 	switch action {
-	case "1":
+	case 1:
 		err = followDao.FollowUser(followBo)
-	case "2":
+	case 2:
 		err = followDao.UnFollowUser(followBo)
 	}
 	if err != nil {
 		global.GVA_LOG.Error(err.Error())
-		return "", err
+		return 0, err
 	}
 
 	return action, nil
