@@ -20,16 +20,19 @@ type UserService struct{}
 // GetUserInfo get user information
 func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	userId := userInfo.UserId
-	toId := userInfo.Claims.BaseClaims.Id
+	myId := userInfo.Claims.BaseClaims.Id
 
-	isMyself := userId == toId
+	// judge whether me
+	isMyself := userId == myId
 
 	userInfoBo := bo.UserInfoBo{}
 
 	var userModel model.UserDao
 	var err error
+
 	wg := sync.WaitGroup{}
 	wg.Add(2)
+
 	go func() {
 		defer wg.Done()
 		userModel, err = userDao.GetUser(userId)
@@ -44,11 +47,10 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 
 		// use follow service judge whether I followed him
 		var count int64
-		count, err = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: userId, ToUserId: toId})
+		count, err = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
 		if count != 0 {
 			userInfoBo.Follow = true
 		}
-
 	}()
 
 	wg.Wait()

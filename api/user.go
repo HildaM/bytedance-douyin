@@ -4,7 +4,6 @@ import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -56,7 +55,7 @@ func (UserApi) Login(c *gin.Context) {
 func (api *UserApi) UserInfo(c *gin.Context) {
 	var userInfo vo.UserInfoVo
 	if err := c.ShouldBind(&userInfo); err != nil {
-		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		response.FailWithMessage(c, err.Error())
 		return
 	}
 	//token := userInfo.Token
