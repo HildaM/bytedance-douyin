@@ -27,7 +27,7 @@ func (UserDao) GetUser(userId int64) (model.UserDao, error) {
 	}
 	return user, nil
 }
-func (UserDao) GetUserByName(name string) error {
+func (UserDao) GetUserByNameToJudge(name string) error {
 	var user model.UserDao
 	err := global.GVA_DB.Where("name = ?", name).First(&user).Error
 	// 没有该条记录
@@ -53,7 +53,7 @@ func (u UserDao) RegisterUser(userBo bo.UserBo) (bo.UserRegisterBo, error) {
 	user := model.UserDao{Name: userBo.Name, Password: userBo.Pwd}
 	var urb bo.UserRegisterBo
 	// 判断用户名是否已存在
-	err := u.GetUserByName(userBo.Name)
+	err := u.GetUserByNameToJudge(userBo.Name)
 	if err != nil {
 		return urb, err
 	}
