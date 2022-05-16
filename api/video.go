@@ -65,10 +65,10 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 
 // VideoFeed 视频流接口
 func (api *VideoApi) VideoFeed(c *gin.Context) {
-	//videoList := make([]*data.Video, 1, 1)
-	//user := data.Author{Id: 1, Name: "charon", FollowCount: 0, FollowerCount: 1, IsFollow: false}
-	//videoList[0] = &data.Video{Id: 1, Author: &user, PlayUrl: "http://220.243.147.162:8080/videos/sss.mp4", CoverUrl: "http://220.243.147.162:8080/images/sss.jpg", FavoriteCount: 0, CommentCount: 0, IsFavorite: false}
-	//data := data.FeedData{NextTime: time.Now().Unix(), VideoList: videoList}
+	//videoList := make([]*vo.Video, 1, 1)
+	//user := vo.Author{Id: 1, Name: "charon", FollowCount: 0, FollowerCount: 1, IsFollow: false}
+	//videoList[0] = &vo.Video{Id: 1, Author: &user, PlayUrl: "http://220.243.147.162:8080/videos/sss.mp4", CoverUrl: "http://220.243.147.162:8080/images/sss.jpg", FavoriteCount: 0, CommentCount: 0, IsFavorite: false}
+	//data := vo.FeedResponseVo{NextTime: time.Now().Unix(), VideoList: videoList}
 	//response.OkWithData(c, data)
 }
 
