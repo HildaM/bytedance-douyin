@@ -16,8 +16,9 @@ type FollowListVo struct {
 
 // FollowerListVo 粉丝列表
 type FollowerListVo struct {
-	UserId int64  `form:"user_id" binding:"required"`
-	Token  string `form:"token" binding:"required"`
+	UserId  int64  `form:"user_id" binding:"required"`
+	Token   string `form:"token" binding:"required"`
+	TokenId int64
 }
 
 type FollowResponseVo struct {

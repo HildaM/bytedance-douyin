@@ -3,6 +3,7 @@ package api
 import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
@@ -71,6 +72,11 @@ func (api *FollowApi) FansList(c *gin.Context) {
 	if err := c.ShouldBind(&userInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 	}
+	tokenId, ok := c.Get("tokenId")
+	if !ok {
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+	}
+	userInfo.TokenId = tokenId.(int64)
 
 	fanList, err := followerService.GetFanList(userInfo)
 	if err != nil {

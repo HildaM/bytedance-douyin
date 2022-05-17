@@ -9,14 +9,13 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"bytedance-douyin/utils"
 	"errors"
 	"reflect"
 )
 
 type FollowDao struct{}
 
-// GetFollowList Abandon
+//Deprecated
 func (dao FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 
@@ -51,7 +50,7 @@ func (dao FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	return followList, nil
 }
 
-// GetFollowList2 pass
+// GetFollowList pass
 func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 	var follows []*vo.UserInfo
@@ -182,15 +181,9 @@ func (FollowDao) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, 
 	var fans []*vo.UserInfo
 
 	userId := userInfo.UserId
+	tokenId := userInfo.TokenId
 
-	j := utils.NewJWT()
-	claims, err := j.ParseToken(userInfo.Token)
-	if err != nil {
-		return fansList, err
-	}
-	tokenId := claims.BaseClaims.Id
-
-	err = global.GVA_DB.Raw(
+	err := global.GVA_DB.Raw(
 		"SELECT a.user_id as id, u.name, u.follow_count, u.follower_count,"+
 			"CASE WHEN a.user_id = b.to_user_id THEN true ELSE false END as `is_follow`"+
 			"FROM (SELECT user_id FROM t_follow f WHERE f.to_user_id = ? AND f.deleted_at is NULL) a"+
