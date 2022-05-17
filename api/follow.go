@@ -19,7 +19,7 @@ type FollowApi struct{}
 func (api *FollowApi) Follow(c *gin.Context) {
 	var followInfo vo.FollowVo
 	if err := c.ShouldBind(&followInfo); err != nil {
-		r.FailWithMessage(c, "参数校验失败")
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 	}
 
 	var err error
@@ -49,7 +49,7 @@ func (api *FollowApi) Follow(c *gin.Context) {
 func (api *FollowApi) FollowList(c *gin.Context) {
 	var userInfo vo.FollowListVo
 	if err := c.ShouldBind(&userInfo); err != nil {
-		r.FailWithMessage(c, "参数校验失败")
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 	}
 
 	userList, err := followService.GetFollowList(userInfo)
@@ -69,7 +69,7 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 func (api *FollowApi) FansList(c *gin.Context) {
 	var userInfo vo.FollowerListVo
 	if err := c.ShouldBind(&userInfo); err != nil {
-		r.FailWithMessage(c, "参数校验失败")
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 	}
 
 	fanList, err := followerService.GetFanList(userInfo)
