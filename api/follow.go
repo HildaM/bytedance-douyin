@@ -21,6 +21,7 @@ func (api *FollowApi) Follow(c *gin.Context) {
 	var followInfo vo.FollowVo
 	if err := c.ShouldBind(&followInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
 	}
 
 	var err error
@@ -51,11 +52,13 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 	var userInfo vo.FollowListVo
 	if err := c.ShouldBind(&userInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
 	}
 
 	userList, err := followService.GetFollowList(userInfo)
 	if err != nil {
 		r.FailWithMessage(c, fmt.Sprintf("%s", err))
+		return
 	}
 	r.OkWithData(c, userList)
 }
@@ -71,16 +74,19 @@ func (api *FollowApi) FansList(c *gin.Context) {
 	var userInfo vo.FollowerListVo
 	if err := c.ShouldBind(&userInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
 	}
 	tokenId, ok := c.Get("tokenId")
 	if !ok {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
 	}
 	userInfo.TokenId = tokenId.(int64)
 
 	fanList, err := followerService.GetFanList(userInfo)
 	if err != nil {
 		r.FailWithMessage(c, fmt.Sprintf("%s", err))
+		return
 	}
 
 	r.OkWithData(c, fanList)

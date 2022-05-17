@@ -3,6 +3,7 @@ package api
 import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"bytedance-douyin/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,7 @@ type UserApi struct{}
 func (UserApi) Register(c *gin.Context) {
 	var userRegister vo.UserVo
 	if err := c.ShouldBind(&userRegister); err != nil {
-		response.FailWithMessage(c, err.Error())
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
 
@@ -35,7 +36,7 @@ func (UserApi) Register(c *gin.Context) {
 func (UserApi) Login(c *gin.Context) {
 	var userLogin vo.UserVo
 	if err := c.ShouldBind(&userLogin); err != nil {
-		response.FailWithMessage(c, err.Error())
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
 	userId, err := userService.LoginUser(userLogin)
@@ -58,7 +59,7 @@ func (api *UserApi) UserInfo(c *gin.Context) {
 	var userInfo vo.UserInfoVo
 
 	if err := c.ShouldBind(&userInfo); err != nil {
-		response.FailWithMessage(c, err.Error())
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
 
