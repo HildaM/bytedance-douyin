@@ -21,12 +21,12 @@ func (c *FollowRouter) InitFollowRouter(Router *gin.RouterGroup) {
 	followApi := api.GroupApp.FollowApi
 	{
 		// /relation/action
-		baseRouter.POST("action", followApi.Follow)
+		baseRouter.POST("action/", followApi.Follow)
 		// /relation/follow/list
-		followRouter.GET("list", followApi.FollowList)
+		followRouter.GET("list/", followApi.FollowList)
 	}
 	{
 		// /relation/follower/list
-		followerRouter.GET("list", followApi.FansList)
+		followerRouter.GET("list/", followApi.FansList)
 	}
 }
