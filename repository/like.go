@@ -4,7 +4,6 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"sync"
 )
 
 type LikeDao struct{}
@@ -43,6 +42,17 @@ func (LikeDao) GetVideoIdListByUserId(userId int64) ([]int64, error) {
 	return videoIdList, nil
 }
 
+func (LikeDao) GetVideoLike(videoId int64) (int64, error) {
+	db := global.GVA_DB
+
+	var count int64
+	if err := db.Model(&model.Like{}).Where("video_id = ?", videoId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (LikeDao) GetIsFavorite(videoLikedBo bo.VideoLikedBo) (int64, error) {
 	db := global.GVA_DB
 
@@ -54,7 +64,7 @@ func (LikeDao) GetIsFavorite(videoLikedBo bo.VideoLikedBo) (int64, error) {
 	return count, nil
 }
 
-var lock sync.Mutex
+//var lock sync.Mutex
 
 //并发时获赞次数可能会变？加锁？
 func (LikeDao) LikeVideo(likedInfo bo.VideoLikedBo) error {
@@ -64,27 +74,27 @@ func (LikeDao) LikeVideo(likedInfo bo.VideoLikedBo) error {
 		UserId:  likedInfo.UserId,
 		VideoId: likedInfo.VideoId,
 	}
-	var videoDao VideoDao
+	//var videoDao VideoDao
 	tx.Debug().Create(&like)
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error
 	}
-	lock.Lock()
-	//根据video_id查询视频，获得video信息
-	video, err := videoDao.GetVideoById(likedInfo.VideoId)
-	if err != nil {
-		lock.Unlock()
-		return err
-	}
-	//更新video的favorite_count字段
-	tx.Debug().Model(&video).Update("favorite_count", video.FavoriteCount+1)
-	if tx.Error != nil {
-		tx.Rollback()
-		lock.Unlock()
-		return tx.Error
-	}
-	lock.Unlock()
+	//lock.Lock()
+	////根据video_id查询视频，获得video信息
+	//video, err := videoDao.GetVideoById(likedInfo.VideoId)
+	//if err != nil {
+	//	lock.Unlock()
+	//	return err
+	//}
+	////更新video的favorite_count字段
+	//tx.Debug().Model(&video).Update("favorite_count", video.FavoriteCount+1)
+	//if tx.Error != nil {
+	//	tx.Rollback()
+	//	lock.Unlock()
+	//	return tx.Error
+	//}
+	//lock.Unlock()
 
 	//用户若有获赞数量，则根据video author查用户表，再在获赞数量字段+1
 	//video中favorite_count字段+1
@@ -103,27 +113,28 @@ func (LikeDao) UnLikeVideo(likedInfo bo.VideoLikedBo) error {
 		UserId:  likedInfo.UserId,
 		VideoId: likedInfo.VideoId,
 	}
-	var videoDao VideoDao
-	tx.Debug().Where("user_id = ? and video_id = ?", likedInfo.UserId, likedInfo.VideoId).Delete(&unlike)
+	//var videoDao VideoDao
+	//暂时先硬删除
+	tx.Debug().Unscoped().Where("user_id = ? and video_id = ?", likedInfo.UserId, likedInfo.VideoId).Delete(&unlike)
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error
 	}
-	lock.Lock()
-	//根据video_id查询视频，获得video信息
-	video, err := videoDao.GetVideoById(likedInfo.VideoId)
-	if err != nil {
-		lock.Unlock()
-		return err
-	}
-	//更新video的favorite_count字段
-	tx.Debug().Model(&video).Update("favorite_count", video.FavoriteCount-1)
-	if tx.Error != nil {
-		tx.Rollback()
-		lock.Unlock()
-		return tx.Error
-	}
-	lock.Unlock()
+	//lock.Lock()
+	////根据video_id查询视频，获得video信息
+	//video, err := videoDao.GetVideoById(likedInfo.VideoId)
+	//if err != nil {
+	//	lock.Unlock()
+	//	return err
+	//}
+	////更新video的favorite_count字段
+	//tx.Debug().Model(&video).Update("favorite_count", video.FavoriteCount-1)
+	//if tx.Error != nil {
+	//	tx.Rollback()
+	//	lock.Unlock()
+	//	return tx.Error
+	//}
+	//lock.Unlock()
 
 	//用户若有获赞数量，则根据video author查用户表，再在获赞数量字段-1
 	//video中favorite_count字段-1
