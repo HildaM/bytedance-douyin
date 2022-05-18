@@ -4,7 +4,7 @@ import (
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"github.com/u2takey/go-utils/encrypt"
+	"bytedance-douyin/utils"
 	"sync"
 )
 
@@ -71,7 +71,7 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 func (UserService) RegisterUser(user vo.UserVo) (bo.UserRegisterBo, error) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
-	userBo.Pwd = encrypt.Md5([]byte(user.Password))
+	userBo.Pwd = utils.GetSHA256(user.Password)
 	urb, err := userDao.RegisterUser(userBo)
 	if err != nil {
 		return urb, err
@@ -82,7 +82,7 @@ func (UserService) RegisterUser(user vo.UserVo) (bo.UserRegisterBo, error) {
 func (UserService) LoginUser(user vo.UserVo) (int64, error) {
 	var userBo bo.UserBo
 	userBo.Name = user.Username
-	userBo.Pwd = encrypt.Md5([]byte(user.Password))
+	userBo.Pwd = utils.GetSHA256(user.Password)
 	userId, err := userDao.QueryUserByNameAndPassword(userBo)
 	if err != nil {
 		return userId, err
