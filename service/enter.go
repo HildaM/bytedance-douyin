@@ -13,8 +13,9 @@ type Group struct {
 	UserService     UserService
 	FollowService   FollowService
 	FollowerService FollowerService
-	LikeService     LikeService
 	CommentService  CommentService
+	LikeService     LikeService
+	VideoService    VideoService
 }
 
 var GroupApp Group
@@ -25,4 +26,5 @@ var (
 	commentDao = repository.GroupApp.CommentDao
 	followDao  = repository.GroupApp.FollowDao
 	likeDao    = repository.GroupApp.LikeDao
+	videoDao   = repository.GroupApp.VideoDao
 )

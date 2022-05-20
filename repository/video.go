@@ -7,6 +7,7 @@ package repository
 import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
+	"bytedance-douyin/service/bo"
 )
 
 type VideoDao struct{}
@@ -25,4 +26,21 @@ func (VideoDao) GetVideoById(videoId int64) (model.Video, error) {
 		return video, result.Error
 	}
 	return video, nil
+}
+
+// PostVideo
+// @Description: 新增视频记录的 Dao
+// @Author: jtan
+func (VideoDao) PostVideo(post bo.VideoPost) error {
+	video := model.Video{
+		AuthorId:      post.AuthorId,
+		PlayUrl:       post.PlayUrl,
+		CoverUrl:      post.CoverUrl,
+		FavoriteCount: 0,
+		CommentCount:  0,
+	}
+	if result := global.GVA_DB.Create(&video); result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

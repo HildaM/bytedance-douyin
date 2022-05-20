@@ -13,6 +13,7 @@ type Group struct {
 	FollowDao  FollowDao
 	CommentDao CommentDao
 	LikeDao    LikeDao
+	VideoDao   VideoDao
 }
 
 var GroupApp Group

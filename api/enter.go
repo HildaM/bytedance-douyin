@@ -25,6 +25,7 @@ var (
 	userService     = service.GroupApp.UserService
 	followService   = service.GroupApp.FollowService
 	followerService = service.GroupApp.FollowerService
-	likeService     = service.GroupApp.LikeService
 	commentService  = service.GroupApp.CommentService
+	likeService     = service.GroupApp.LikeService
+	videoService    = service.GroupApp.VideoService
 )
