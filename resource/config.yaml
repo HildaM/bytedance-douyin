@@ -12,6 +12,9 @@ zap:
 file:
   video-output: /home/files/videos/
   image-output: /home/files/images/
+#  jtan's local test directory
+#  video-output: C:\Users\jtan\Desktop\douyin-backend\
+#  image-output: C:\Users\jtan\Desktop\douyin-backend\
 
 redis:
   addr: '220.243.147.162'

@@ -8,6 +8,7 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
+	"gorm.io/gorm"
 )
 
 type VideoDao struct{}
@@ -43,4 +44,16 @@ func (VideoDao) PostVideo(post bo.VideoPost) error {
 		return result.Error
 	}
 	return nil
+}
+
+func (VideoDao) GetVideoList(userId int64) (*[]bo.Video, error) {
+	videos := make([]bo.Video, 0)
+	result := global.GVA_DB.Model(&model.Video{}).Preload("Author", func(db *gorm.DB) *gorm.DB {
+		return db.Table(model.UserDao{}.TableName())
+	}).Where("author_id = ?", userId).Find(&videos)
+	
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &videos, nil
 }

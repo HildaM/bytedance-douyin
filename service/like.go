@@ -12,20 +12,20 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 	var favoriteVideoList vo.FavoriteResponseVo
 	userId := likeListInfo.UserId
 	videos, err := likeDao.GetLikeList(userId)
-
+	
 	if err != nil {
 		return favoriteVideoList, err
 	}
-
+	
 	videoList := make([]*vo.Video, 0, len(videos))
-
-	//CoverUrl
+	
+	// CoverUrl
 	for _, video := range videos {
 		author, err := userDao.GetUser(video.AuthorId)
 		if err != nil {
 			return favoriteVideoList, err
 		}
-		//获取is_follow
+		// 获取is_follow
 		isFollow := true
 		count, err := followDao.GetFollowCount(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
 		if err != nil {
@@ -34,9 +34,9 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 		if count == 0 {
 			isFollow = false
 		}
-
+		
 		videoInfo := vo.Video{
-			Id: video.VideoId,
+			Id: video.ID,
 			Author: &vo.Author{
 				Id:            author.ID,
 				Name:          author.Name,
@@ -53,7 +53,7 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 		videoList = append(videoList, &videoInfo)
 	}
 	favoriteVideoList.VideoList = videoList
-
+	
 	return favoriteVideoList, nil
 }
 
@@ -62,7 +62,7 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 		UserId:  likeInfo.UserId,
 		VideoId: likeInfo.VideoId,
 	}
-	//查询是否有该点赞记录
+	// 查询是否有该点赞记录
 	count, err := likeDao.GetIsFavorite(videoLikedBo)
 	action := likeInfo.ActionType
 	if err != nil {
@@ -70,19 +70,19 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 	}
 	switch {
 	case count != 0 && action == 1:
-		//点过赞还点
-		//可不处理
+		// 点过赞还点
+		// 可不处理
 	case count == 0 && action == 1:
-		//没点过赞点赞
+		// 没点过赞点赞
 		err = likeDao.LikeVideo(videoLikedBo)
 	case count != 0 && action == 2:
-		//点过赞取消点赞
+		// 点过赞取消点赞
 		err = likeDao.UnLikeVideo(videoLikedBo)
 	}
 	if err != nil {
 		global.GVA_LOG.Error(err.Error())
 		return 0, err
 	}
-
+	
 	return action, nil
 }

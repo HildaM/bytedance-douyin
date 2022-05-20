@@ -7,7 +7,6 @@ import (
 	"bytedance-douyin/service/bo"
 	"bytedance-douyin/utils"
 	"fmt"
-	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	"os"
 	"path/filepath"
@@ -50,26 +49,28 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	
 	// 上传file文件到指定的文件路径fn
 	if err := c.SaveUploadedFile(file, fn); err != nil {
+		fmt.Println("存储视频失败, filePath,", fn)
 		response.FailWithMessage(c, err.Error())
 		return
 	}
 	
+	// FIXME: utils.ReadFrameAsJpeg 在本地环境下出错
 	// 读取视频文件的第一帧作为视频封面
-	reader := utils.ReadFrameAsJpeg(fn)
-	img, err := imaging.Decode(reader)
-	if err != nil {
-		response.FailWithMessage(c, err.Error())
-		return
-	}
-	imagePath := global.GVA_CONFIG.File.ImageOutput
+	// reader := utils.ReadFrameAsJpeg(fn)
+	// img, err := imaging.Decode(reader)
+	// if err != nil {
+	// 	response.FailWithMessage(c, err.Error())
+	// 	return
+	// }
+	// imagePath := global.GVA_CONFIG.File.ImageOutput
 	
 	// replace .mp4 to .jpg
 	imageName := videoName[:len(videoName)-4]
-	url := imagePath + imageName + ".jpg"
-	if err := imaging.Save(img, url); err != nil {
-		response.FailWithMessage(c, err.Error())
-		return
-	}
+	// url := imagePath + imageName + ".jpg"
+	// if err := imaging.Save(img, url); err != nil {
+	// 	response.FailWithMessage(c, err.Error())
+	// 	return
+	// }
 	
 	// @Author: jtan
 	// @Description: 存储上传的 video
@@ -99,4 +100,14 @@ func (api *VideoApi) VideoFeed(c *gin.Context) {
 }
 
 func (api *VideoApi) VideoList(c *gin.Context) {
+	bc := c.Keys["claims"]
+	claims := bc.(vo.BaseClaims)
+	userId := claims.Id
+	list, err := videoService.GetVideoList(userId)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
+	fmt.Println(list)
+	response.OkWithData(c, vo.PublishResponseVo{VideoList: list})
 }
