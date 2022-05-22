@@ -109,6 +109,7 @@ func (api *VideoApi) VideoFeed(c *gin.Context) {
 		claims, err := j.ParseTokenRedis(token)
 		if err != nil {
 			response.FailWithMessage(c, err.Error())
+			return
 		}
 		tokenId = claims.BaseClaims.Id
 	}

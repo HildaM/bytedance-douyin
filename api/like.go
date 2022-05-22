@@ -21,6 +21,7 @@ func (api *LikeApi) Like(c *gin.Context) {
 	var likeInfo vo.FavoriteActionVo
 	if err := c.ShouldBind(&likeInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
 	}
 	code, err := likeService.LikeOrCancel(likeInfo)
 	if err != nil {
@@ -41,6 +42,7 @@ func (api *LikeApi) LikeList(c *gin.Context) {
 	var likeListInfo vo.FavoriteListVo
 	if err := c.ShouldBind(&likeListInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
 	}
 
 	tokenId, ok := c.Get("tokenId")
@@ -53,6 +55,7 @@ func (api *LikeApi) LikeList(c *gin.Context) {
 	likeList, err := likeService.GetLikeList(likeListInfo)
 	if err != nil {
 		r.FailWithMessage(c, err.Error())
+		return
 	}
 
 	r.OkWithData(c, likeList)

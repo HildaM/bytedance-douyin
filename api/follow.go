@@ -4,7 +4,6 @@ import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/exceptions"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -57,7 +56,7 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 
 	userList, err := followService.GetFollowList(userInfo)
 	if err != nil {
-		r.FailWithMessage(c, fmt.Sprintf("%s", err))
+		r.FailWithMessage(c, err.Error())
 		return
 	}
 	r.OkWithData(c, userList)
@@ -85,7 +84,7 @@ func (api *FollowApi) FansList(c *gin.Context) {
 
 	fanList, err := followerService.GetFanList(userInfo)
 	if err != nil {
-		r.FailWithMessage(c, fmt.Sprintf("%s", err))
+		r.FailWithMessage(c, err.Error())
 		return
 	}
 
