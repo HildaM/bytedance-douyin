@@ -175,3 +175,85 @@ func (s VideoService) GetVideoFeed(userId, t int64) ([]vo.Video, error) {
 
 	return videoList, nil
 }
+
+func handleFollowCondition(videos []model.Video, userId int64) ([]vo.Video, error) {
+	toUserIdList := make([]int64, len(videos))
+	toVideoIdList := make([]int64, len(videos))
+	for i, v := range videos {
+		toUserIdList[i] = v.AuthorId
+		toVideoIdList[i] = v.ID
+	}
+
+	// 查询视频的发布者是否是用户的关注
+	// 如果没有登录，则全部没关注
+	// 否则，通过查询数据库确定
+	followUserMap := make(map[int64]bool, len(toUserIdList))
+	followVideoMap := make(map[int64]bool, len(toVideoIdList))
+	// 没有登录或是自己的
+	isLogin := userId != -1
+	if !isLogin {
+		// 全部赋值为false
+		for _, uId := range toUserIdList {
+			followUserMap[uId] = false
+			followVideoMap[uId] = false
+		}
+	} else {
+		wg := sync.WaitGroup{}
+		wg.Add(2)
+
+		var err1, err2 error
+		// 查询用户是否关注
+		go func() {
+			defer wg.Done()
+			followUserMap, err1 = followDao.GetFollowUserIdByUserId(userId, toUserIdList)
+		}()
+
+		// 查询视频是否点赞
+		go func() {
+			defer wg.Done()
+			followVideoMap, err2 = likeDao.GetFollowVideoIdByUserId(userId, toVideoIdList)
+		}()
+		wg.Wait()
+		if err1 != nil {
+			return nil, err1
+		}
+		if err2 != nil {
+			return nil, err2
+		}
+	}
+
+	videoList := make([]vo.Video, len(videos))
+
+	for i, video := range videos {
+		isFollowAuthor, ok := followUserMap[video.AuthorId]
+		isFollowVideo, ok2 := followVideoMap[video.ID]
+		if !ok {
+			isFollowAuthor = false
+		}
+		if !ok2 {
+			isFollowVideo = false
+		}
+		videoList[i] = vo.Video{Id: video.ID,
+			Author: &vo.Author{
+				Id:            video.AuthorId,
+				Name:          video.Author.Name,
+				FollowCount:   video.Author.FollowCount,
+				FollowerCount: video.Author.FollowerCount,
+				IsFollow:      isFollowAuthor,
+			},
+			PlayUrl:       utils.VideoUrlPrefix + video.PlayUrl,
+			CoverUrl:      utils.ImageUrlPrefix + video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    isFollowVideo,
+			Title:         video.Title,
+			CreatedAt:     video.CreatedAt,
+		}
+
+	}
+	return videoList, nil
+}
+
+func (VideoService) HandleFollowCondition(videos []model.Video, userId int64) ([]vo.Video, error) {
+	return handleFollowCondition(videos, userId)
+}
