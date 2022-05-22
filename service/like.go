@@ -79,7 +79,7 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 	case count != 0 && action == 1:
 		// 点过赞还点
 		// 可不处理
-		// FIXME: 可能之前取消点赞
+		// TODO: 可能之前取消过点赞
 	case count == 0 && action == 1:
 		// 没点过赞点赞
 		err = likeDao.LikeVideo(videoLikedBo)
