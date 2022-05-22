@@ -3,13 +3,14 @@ package api
 import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"bytedance-douyin/global"
 	"bytedance-douyin/service/bo"
 	"bytedance-douyin/utils"
 	"fmt"
+	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -34,14 +35,14 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	claims := bc.(vo.BaseClaims)
 	userId := claims.Id
 	username := claims.Name
-	
-	ex, err := os.Executable()
+
+	_, err = os.Executable()
 	if err != nil {
 		panic(err)
 	}
-	exPath := filepath.Dir(ex)
-	fmt.Println(exPath)
-	
+	//exPath := filepath.Dir(ex)
+	//fmt.Println(exPath)
+
 	// 通过token获取用户名及用户id
 	path := global.GVA_CONFIG.File.VideoOutput
 	videoName := utils.GenerateFilename(username, userId)
@@ -53,25 +54,24 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
-	
-	// FIXME: utils.ReadFrameAsJpeg 在本地环境下出错
+
 	// 读取视频文件的第一帧作为视频封面
-	// reader := utils.ReadFrameAsJpeg(fn)
-	// img, err := imaging.Decode(reader)
-	// if err != nil {
-	// 	response.FailWithMessage(c, err.Error())
-	// 	return
-	// }
-	// imagePath := global.GVA_CONFIG.File.ImageOutput
-	
+	reader := utils.ReadFrameAsJpeg(fn)
+	img, err := imaging.Decode(reader)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
+	imagePath := global.GVA_CONFIG.File.ImageOutput
+
 	// replace .mp4 to .jpg
 	imageName := videoName[:len(videoName)-4]
-	// url := imagePath + imageName + ".jpg"
-	// if err := imaging.Save(img, url); err != nil {
-	// 	response.FailWithMessage(c, err.Error())
-	// 	return
-	// }
-	
+	url := imagePath + imageName + ".jpg"
+	if err := imaging.Save(img, url); err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
+
 	// @Author: jtan
 	// @Description: 存储上传的 video
 	playUrl := videoName
