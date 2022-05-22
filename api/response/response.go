@@ -29,7 +29,7 @@ type BasicResponse struct {
 }
 
 func withDetailed(c *gin.Context, code int8, message string, data interface{}) {
-	m := struct2Map(&BasicResponse{StatusCode: code, StatusMessage: message, Data: data})
+	m := struct2Map(BasicResponse{StatusCode: code, StatusMessage: message, Data: data})
 
 	if code != SUCCESS {
 		go func() {
@@ -41,11 +41,11 @@ func withDetailed(c *gin.Context, code int8, message string, data interface{}) {
 }
 
 func Ok(c *gin.Context) {
-	c.JSON(http.StatusOK, &BasicResponse{StatusCode: SUCCESS, StatusMessage: SUCCESS_MESSAGE})
+	c.JSON(http.StatusOK, BasicResponse{StatusCode: SUCCESS, StatusMessage: SUCCESS_MESSAGE})
 }
 
 func OkWithMessage(c *gin.Context, message string) {
-	c.JSON(http.StatusOK, &BasicResponse{StatusCode: SUCCESS, StatusMessage: message})
+	c.JSON(http.StatusOK, BasicResponse{StatusCode: SUCCESS, StatusMessage: message})
 }
 
 func OkWithData(c *gin.Context, data interface{}) {
@@ -57,11 +57,11 @@ func OkWithDetailed(c *gin.Context, message string, data interface{}) {
 }
 
 func Fail(c *gin.Context) {
-	c.JSON(http.StatusOK, &BasicResponse{StatusCode: ERROR, StatusMessage: ERROR_MESSAGE})
+	c.JSON(http.StatusOK, BasicResponse{StatusCode: ERROR, StatusMessage: ERROR_MESSAGE})
 }
 
 func FailWithMessage(c *gin.Context, message string) {
-	c.JSON(http.StatusOK, &BasicResponse{StatusCode: ERROR, StatusMessage: message})
+	c.JSON(http.StatusOK, BasicResponse{StatusCode: ERROR, StatusMessage: message})
 }
 
 func FailWithData(c *gin.Context, data interface{}) {
