@@ -3,6 +3,7 @@ package service
 import (
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/service/bo"
+	"bytedance-douyin/utils"
 	"sync"
 )
 
@@ -121,8 +122,8 @@ func (s VideoService) GetVideoFeed(userId, t int64) ([]vo.Video, error) {
 				FollowerCount: video.Author.FollowerCount,
 				IsFollow:      isFollowAuthor,
 			},
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
+			PlayUrl:       utils.VideoUrlPrefix + video.PlayUrl,
+			CoverUrl:      utils.ImageUrlPrefix + video.CoverUrl,
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
 			IsFavorite:    isFollowVideo,

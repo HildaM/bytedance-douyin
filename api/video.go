@@ -36,6 +36,12 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	userId := claims.Id
 	username := claims.Name
 
+	title, ok := c.GetPostForm("title")
+	if !ok {
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+
 	_, err = os.Executable()
 	if err != nil {
 		panic(err)
@@ -45,8 +51,8 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 
 	// 通过token获取用户名及用户id
 	path := global.GVA_CONFIG.File.VideoOutput
-	videoName := utils.GenerateFilename(username, userId)
-	fn := path + videoName + ".mp4"
+	videoName := utils.GenerateFilename(username, userId) + ".mp4"
+	fn := path + videoName
 
 	// 上传file文件到指定的文件路径fn
 	if err := c.SaveUploadedFile(file, fn); err != nil {
@@ -65,8 +71,8 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	imagePath := global.GVA_CONFIG.File.ImageOutput
 
 	// replace .mp4 to .jpg
-	imageName := videoName[:len(videoName)-4]
-	url := imagePath + imageName + ".jpg"
+	imageName := videoName[:len(videoName)-4] + ".jpg"
+	url := imagePath + imageName
 	if err := imaging.Save(img, url); err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
@@ -80,6 +86,7 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 		AuthorId: userId,
 		PlayUrl:  playUrl,
 		CoverUrl: coverUrl,
+		Title:    title,
 	}
 	err = videoService.PostVideo(videoPost)
 	if err != nil {

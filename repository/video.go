@@ -37,6 +37,7 @@ func (VideoDao) PostVideo(post bo.VideoPost) error {
 		AuthorId:      post.AuthorId,
 		PlayUrl:       post.PlayUrl,
 		CoverUrl:      post.CoverUrl,
+		Title:         post.Title,
 		FavoriteCount: 0,
 		CommentCount:  0,
 	}

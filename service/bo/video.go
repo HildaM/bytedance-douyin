@@ -6,6 +6,7 @@ type VideoPost struct {
 	AuthorId int64
 	PlayUrl  string
 	CoverUrl string
+	Title    string
 }
 
 type Video struct {
