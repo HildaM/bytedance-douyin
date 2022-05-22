@@ -157,6 +157,6 @@ func (api *VideoApi) VideoList(c *gin.Context) {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
-	fmt.Println(list)
+
 	response.OkWithData(c, vo.PublishResponseVo{VideoList: list})
 }

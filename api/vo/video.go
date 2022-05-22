@@ -14,6 +14,7 @@ type FavoriteActionVo struct {
 type FavoriteListVo struct {
 	UserId int64  `form:"user_id" binding:"required"`
 	Token  string `form:"token" binding:"required"`
+	MyId   int64
 }
 
 // FeedVo 视频流

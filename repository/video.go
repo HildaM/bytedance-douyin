@@ -15,8 +15,11 @@ type VideoDao struct{}
 
 func (VideoDao) GetVideos(videoIds []int64) ([]model.Video, error) {
 	var videos []model.Video
-	if result := global.GVA_DB.Where("id in (?)", videoIds).Find(&videos); result.Error != nil {
-		return videos, result.Error
+	err := global.GVA_DB.Model(&model.Video{}).Preload("Author", func(db *gorm.DB) *gorm.DB {
+		return db.Table(model.UserDao{}.TableName())
+	}).Where("id in (?)", videoIds).Find(&videos).Error
+	if err != nil {
+		return videos, err
 	}
 	return videos, nil
 }
@@ -47,8 +50,8 @@ func (VideoDao) PostVideo(post bo.VideoPost) error {
 	return nil
 }
 
-func (VideoDao) GetVideoListByUserId(userId int64) (*[]bo.Video, error) {
-	videos := make([]bo.Video, 0)
+func (VideoDao) GetVideoListByUserId(userId int64) ([]model.Video, error) {
+	videos := make([]model.Video, 0)
 	result := global.GVA_DB.Model(&model.Video{}).Preload("Author", func(db *gorm.DB) *gorm.DB {
 		return db.Table(model.UserDao{}.TableName())
 	}).Where("author_id = ?", userId).Find(&videos)
@@ -56,7 +59,7 @@ func (VideoDao) GetVideoListByUserId(userId int64) (*[]bo.Video, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &videos, nil
+	return videos, nil
 }
 
 func (VideoDao) GetVideoListByTime(t int64) ([]model.Video, error) {
