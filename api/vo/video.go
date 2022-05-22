@@ -31,11 +31,11 @@ type FeedResponseVo struct {
 }
 
 type PublishResponseVo struct {
-	VideoList []*Video `json:"video_list" binding:"required"`
+	VideoList []Video `json:"video_list" binding:"required"`
 }
 
 type FavoriteResponseVo struct {
-	VideoList []*Video `json:"video_list" binding:"required"`
+	VideoList []Video `json:"video_list" binding:"required"`
 }
 
 type Video struct {

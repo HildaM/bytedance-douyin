@@ -4,7 +4,6 @@ import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/exceptions"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,15 +36,25 @@ func (api *LikeApi) Like(c *gin.Context) {
 	r.OkWithMessage(c, action+"成功")
 }
 
+// LikeList 点赞列表
 func (api *LikeApi) LikeList(c *gin.Context) {
 	var likeListInfo vo.FavoriteListVo
 	if err := c.ShouldBind(&likeListInfo); err != nil {
-		r.FailWithMessage(c, "参数校验失败")
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 	}
+
+	tokenId, ok := c.Get("tokenId")
+	if !ok {
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+
+	likeListInfo.MyId = tokenId.(int64)
 	likeList, err := likeService.GetLikeList(likeListInfo)
 	if err != nil {
-		r.FailWithMessage(c, fmt.Sprintf("%s", err))
+		r.FailWithMessage(c, err.Error())
 	}
+
 	r.OkWithData(c, likeList)
 
 }

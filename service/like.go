@@ -11,47 +11,54 @@ type LikeService struct{}
 func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteResponseVo, error) {
 	var favoriteVideoList vo.FavoriteResponseVo
 	userId := likeListInfo.UserId
+	myId := likeListInfo.MyId
+	// 视频点赞列表
 	videos, err := likeDao.GetLikeList(userId)
 
 	if err != nil {
 		return favoriteVideoList, err
 	}
 
-	videoList := make([]*vo.Video, 0, len(videos))
-
-	// CoverUrl
-	for _, video := range videos {
-		author, err := userDao.GetUser(video.AuthorId)
-		if err != nil {
-			return favoriteVideoList, err
-		}
-		// 获取is_follow
-		isFollow := true
-		count, err := followDao.GetFollowCount(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
-		if err != nil {
-			return favoriteVideoList, err
-		}
-		if count == 0 {
-			isFollow = false
-		}
-
-		videoInfo := vo.Video{
-			Id: video.ID,
-			Author: &vo.Author{
-				Id:            author.ID,
-				Name:          author.Name,
-				FollowCount:   author.FollowCount,
-				FollowerCount: author.FollowerCount,
-				IsFollow:      isFollow,
-			},
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
-			IsFavorite:    true,
-		}
-		videoList = append(videoList, &videoInfo)
+	videoList, err := GroupApp.VideoService.HandleFollowCondition(videos, myId)
+	if err != nil {
+		return favoriteVideoList, err
 	}
+
+	//videoList := make([]*vo.Video, 0, len(videos))
+	//
+	//// CoverUrl
+	//for _, video := range videos {
+	//	author, err := userDao.GetUser(video.AuthorId)
+	//	if err != nil {
+	//		return favoriteVideoList, err
+	//	}
+	//	// 获取is_follow
+	//	isFollow := true
+	//	count, err := followDao.GetFollowCount(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
+	//	if err != nil {
+	//		return favoriteVideoList, err
+	//	}
+	//	if count == 0 {
+	//		isFollow = false
+	//	}
+	//
+	//	videoInfo := vo.Video{
+	//		Id: video.ID,
+	//		Author: &vo.Author{
+	//			Id:            author.ID,
+	//			Name:          author.Name,
+	//			FollowCount:   author.FollowCount,
+	//			FollowerCount: author.FollowerCount,
+	//			IsFollow:      isFollow,
+	//		},
+	//		PlayUrl:       video.PlayUrl,
+	//		CoverUrl:      video.CoverUrl,
+	//		FavoriteCount: video.FavoriteCount,
+	//		CommentCount:  video.CommentCount,
+	//		IsFavorite:    true,
+	//	}
+	//	videoList = append(videoList, &videoInfo)
+	//}
 	favoriteVideoList.VideoList = videoList
 
 	return favoriteVideoList, nil
