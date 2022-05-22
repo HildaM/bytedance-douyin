@@ -18,3 +18,5 @@
 *.idea
 
 log
+
+resource/*.yaml
