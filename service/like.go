@@ -12,13 +12,13 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 	var favoriteVideoList vo.FavoriteResponseVo
 	userId := likeListInfo.UserId
 	videos, err := likeDao.GetLikeList(userId)
-	
+
 	if err != nil {
 		return favoriteVideoList, err
 	}
-	
+
 	videoList := make([]*vo.Video, 0, len(videos))
-	
+
 	// CoverUrl
 	for _, video := range videos {
 		author, err := userDao.GetUser(video.AuthorId)
@@ -34,7 +34,7 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 		if count == 0 {
 			isFollow = false
 		}
-		
+
 		videoInfo := vo.Video{
 			Id: video.ID,
 			Author: &vo.Author{
@@ -53,7 +53,7 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 		videoList = append(videoList, &videoInfo)
 	}
 	favoriteVideoList.VideoList = videoList
-	
+
 	return favoriteVideoList, nil
 }
 
@@ -72,6 +72,7 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 	case count != 0 && action == 1:
 		// 点过赞还点
 		// 可不处理
+		// FIXME: 可能之前取消点赞
 	case count == 0 && action == 1:
 		// 没点过赞点赞
 		err = likeDao.LikeVideo(videoLikedBo)
@@ -83,6 +84,6 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 		global.GVA_LOG.Error(err.Error())
 		return 0, err
 	}
-	
+
 	return action, nil
 }

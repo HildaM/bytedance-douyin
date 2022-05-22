@@ -66,7 +66,7 @@ func (LikeDao) GetIsFavorite(videoLikedBo bo.VideoLikedBo) (int64, error) {
 
 //var lock sync.Mutex
 
-//并发时获赞次数可能会变？加锁？
+// LikeVideo 并发时获赞次数可能会变？加锁？
 func (LikeDao) LikeVideo(likedInfo bo.VideoLikedBo) error {
 
 	tx := global.GVA_DB.Begin()

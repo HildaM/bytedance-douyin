@@ -3,6 +3,7 @@ package api
 import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
@@ -16,10 +17,11 @@ import (
  */
 type LikeApi struct{}
 
+// Like 点赞操作
 func (api *LikeApi) Like(c *gin.Context) {
 	var likeInfo vo.FavoriteActionVo
 	if err := c.ShouldBind(&likeInfo); err != nil {
-		r.FailWithMessage(c, "参数校验失败")
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 	}
 	code, err := likeService.LikeOrCancel(likeInfo)
 	if err != nil {
