@@ -26,6 +26,8 @@ func RunWindowsServer() {
 	initPprof()
 
 	Router := initialize.Routers()
+	//pprof.Register(Router, "dev/pprof")
+
 	Router.Static("/form-generator", "./resource/page")
 
 	Router.StaticFS("/videos", http.Dir(global.GVA_CONFIG.File.VideoOutput))
