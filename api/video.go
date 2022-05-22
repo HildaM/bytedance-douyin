@@ -11,6 +11,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -136,11 +137,22 @@ func (api *VideoApi) VideoFeed(c *gin.Context) {
 	response.OkWithData(c, data)
 }
 
+// VideoList 视频发布列表
 func (api *VideoApi) VideoList(c *gin.Context) {
-	bc := c.Keys["claims"]
-	claims := bc.(vo.BaseClaims)
-	userId := claims.Id
-	list, err := videoService.GetVideoList(userId)
+	tokenId, ok := c.Get("tokenId")
+	if !ok {
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+	userIdStr := c.Query("user_id")
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
+
+	list, err := videoService.GetVideoList(int64(userId), tokenId.(int64))
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
 		return

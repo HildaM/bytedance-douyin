@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
 	"bytedance-douyin/utils"
 	"sync"
@@ -20,14 +21,53 @@ func (s VideoService) PostVideo(post bo.VideoPost) error {
 	return nil
 }
 
-func (s VideoService) GetVideoList(userId int64) ([]*vo.Video, error) {
-	list, err := videoDao.GetVideoListByUserId(userId)
-	if err != nil {
-		return nil, err
-	}
-	res := make([]*vo.Video, 0)
+func (s VideoService) GetVideoList(userId, myId int64) ([]*vo.Video, error) {
+	var videoErr, userErr, followErr error
+	var list *[]bo.Video
+	var author model.UserDao
 
-	author, err := userDao.GetUser(userId)
+	// 获取用户视频列表
+	wg := sync.WaitGroup{}
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		list, videoErr = videoDao.GetVideoListByUserId(userId)
+	}()
+
+	// 获取用户信息
+	go func() {
+		defer wg.Done()
+		author, userErr = userDao.GetUser(userId)
+	}()
+
+	// 判断是否是粉丝
+	var isFollow bool
+	var count int64
+	isMyself := userId == myId
+	go func() {
+		defer wg.Done()
+		if isMyself {
+			isFollow = false
+			return
+		}
+
+		count, followErr = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
+		if count != 0 {
+			isFollow = true
+		}
+	}()
+	wg.Wait()
+	if videoErr != nil {
+		return nil, videoErr
+	}
+	if userErr != nil {
+		return nil, userErr
+	}
+	if followErr != nil {
+		return nil, followErr
+	}
+
+	res := make([]*vo.Video, 0)
 
 	for _, v := range *list {
 		video := &vo.Video{
@@ -37,11 +77,11 @@ func (s VideoService) GetVideoList(userId int64) ([]*vo.Video, error) {
 				Name:          author.Name,
 				FollowCount:   author.FollowCount,
 				FollowerCount: author.FollowerCount,
-				IsFollow:      false,
+				IsFollow:      isFollow,
 			},
 			// Author:        nil,
-			PlayUrl:       v.PlayUrl,
-			CoverUrl:      v.CoverUrl,
+			PlayUrl:       utils.VideoUrlPrefix + v.PlayUrl,
+			CoverUrl:      utils.ImageUrlPrefix + v.CoverUrl,
 			FavoriteCount: v.FavoriteCount,
 			CommentCount:  v.CommentCount,
 			IsFavorite:    v.IsFavorite,
@@ -79,11 +119,11 @@ func (s VideoService) GetVideoFeed(userId, t int64) ([]vo.Video, error) {
 			followVideoMap[uId] = false
 		}
 	} else {
-		// 查询用户是否关注
 		wg := sync.WaitGroup{}
 		wg.Add(2)
 
 		var err1, err2 error
+		// 查询用户是否关注
 		go func() {
 			defer wg.Done()
 			followUserMap, err1 = followDao.GetFollowUserIdByUserId(userId, toUserIdList)

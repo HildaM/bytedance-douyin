@@ -27,14 +27,14 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 	userInfoBo := bo.UserInfoBo{}
 
 	var userModel model.UserDao
-	var err error
+	var err1, err2 error
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
-		userModel, err = userDao.GetUser(userId)
+		userModel, err1 = userDao.GetUser(userId)
 	}()
 
 	go func() {
@@ -46,7 +46,7 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 
 		// use follow service judge whether I followed him
 		var count int64
-		count, err = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
+		count, err2 = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
 		if count != 0 {
 			userInfoBo.Follow = true
 		}
@@ -54,17 +54,18 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 
 	wg.Wait()
 
-	if err != nil {
-		return userInfoBo, err
+	if err1 != nil {
+		return userInfoBo, err1
+	}
+	if err2 != nil {
+		return userInfoBo, err2
 	}
 
 	userInfoBo.Id = userModel.ID
 	userInfoBo.Name = userModel.Name
 	userInfoBo.FollowCount = userModel.FollowCount
 	userInfoBo.FollowerCount = userModel.FollowerCount
-	//  TODO 相关接口待实现
-	//userInfoBo.FollowCount = userModel.FollowCount
-	//userInfoBo.FollowerCount = userModel.FollowerCount
+
 	return userInfoBo, nil
 }
 
