@@ -210,3 +210,20 @@ func (FollowDao) GetFanCount(followInfo bo.FollowBo) (int64, error) {
 
 	return count, nil
 }
+
+func (FollowDao) GetFollowUserIdByUserId(userId int64, toUserIdList []int64) (map[int64]bool, error) {
+	isFollowList := make([]int64, 0)
+
+	err := global.GVA_DB.Model(&model.Follow{}).Select("to_user_id").Where("user_id = ?", userId).
+		Where("to_user_id IN (?)", toUserIdList).Find(&isFollowList).Error
+	if err != nil {
+		return nil, err
+	}
+
+	followMap := make(map[int64]bool, len(isFollowList))
+	for _, v := range isFollowList {
+		followMap[v] = true
+	}
+	return followMap, nil
+
+}

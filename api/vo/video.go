@@ -1,6 +1,8 @@
 package vo
 
-// 点赞操作
+import "time"
+
+// FavoriteActionVo 点赞操作
 type FavoriteActionVo struct {
 	UserId     int64  `form:"user_id" binding:"required"`
 	Token      string `form:"token" binding:"required"`
@@ -8,15 +10,15 @@ type FavoriteActionVo struct {
 	ActionType int8   `form:"action_type" binding:"required,oneof=1 2"`
 }
 
-// 点赞列表
+// FavoriteListVo 点赞列表
 type FavoriteListVo struct {
 	UserId int64  `form:"user_id" binding:"required"`
 	Token  string `form:"token" binding:"required"`
 }
 
-// 视频流
+// FeedVo 视频流
 type FeedVo struct {
-	LatestTime int32 `form:"latest_time"`
+	LatestTime int64 `form:"latest_time"`
 }
 
 type VideoListVo struct {
@@ -24,8 +26,8 @@ type VideoListVo struct {
 }
 
 type FeedResponseVo struct {
-	NextTime  int64    `json:"next_time"`
-	VideoList []*Video `json:"video_list" binding:"required"`
+	NextTime  int64   `json:"next_time"`
+	VideoList []Video `json:"video_list" binding:"required"`
 }
 
 type PublishResponseVo struct {
@@ -37,13 +39,15 @@ type FavoriteResponseVo struct {
 }
 
 type Video struct {
-	Id            int64   `json:"id"`
-	Author        *Author `json:"author"`
-	PlayUrl       string  `json:"play_url"`
-	CoverUrl      string  `json:"cover_url"`
-	FavoriteCount int64   `json:"favorite_count"`
-	CommentCount  int64   `json:"comment_count"`
-	IsFavorite    bool    `json:"is_favorite"`
+	Id            int64     `json:"id"`
+	Author        *Author   `json:"author"`
+	PlayUrl       string    `json:"play_url"`
+	CoverUrl      string    `json:"cover_url"`
+	FavoriteCount int64     `json:"favorite_count"`
+	CommentCount  int64     `json:"comment_count"`
+	IsFavorite    bool      `json:"is_favorite"`
+	Title         string    `json:"title"`
+	CreatedAt     time.Time `json:"-"`
 }
 
 type Author struct {

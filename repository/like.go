@@ -146,3 +146,19 @@ func (LikeDao) UnLikeVideo(likedInfo bo.VideoLikedBo) error {
 
 	return nil
 }
+
+func (LikeDao) GetFollowVideoIdByUserId(userId int64, videoIdList []int64) (map[int64]bool, error) {
+	followList := make([]int64, 0)
+
+	err := global.GVA_DB.Model(&model.Like{}).Select("video_id").Where("user_id = ?", userId).Where("video_id IN (?)", videoIdList).Find(&followList).Error
+	if err != nil {
+		return nil, err
+	}
+
+	followMap := make(map[int64]bool, len(followList))
+	for _, v := range followList {
+		followMap[v] = true
+	}
+
+	return followMap, nil
+}

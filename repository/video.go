@@ -46,14 +46,31 @@ func (VideoDao) PostVideo(post bo.VideoPost) error {
 	return nil
 }
 
-func (VideoDao) GetVideoList(userId int64) (*[]bo.Video, error) {
+func (VideoDao) GetVideoListByUserId(userId int64) (*[]bo.Video, error) {
 	videos := make([]bo.Video, 0)
 	result := global.GVA_DB.Model(&model.Video{}).Preload("Author", func(db *gorm.DB) *gorm.DB {
 		return db.Table(model.UserDao{}.TableName())
 	}).Where("author_id = ?", userId).Find(&videos)
-	
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &videos, nil
+}
+
+func (VideoDao) GetVideoListByTime(t int64) ([]model.Video, error) {
+	videos := make([]model.Video, 0)
+	//var video model.Video
+
+	// 查询出最新的30个视频
+	err := global.GVA_DB.Model(&model.Video{}).Preload("Author", func(db *gorm.DB) *gorm.DB {
+		return db.Table(model.UserDao{}.TableName())
+	}).Where("created_at <= FROM_UNIXTIME(?)", t).Order("created_at desc").
+		Limit(30).
+		Find(&videos).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return videos, nil
 }

@@ -24,13 +24,13 @@ import (
 type VideoApi struct{}
 
 func (api *VideoApi) PostVideo(c *gin.Context) {
-	
+
 	file, err := c.FormFile("data")
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
-	
+
 	bc := c.Keys["claims"]
 	claims := bc.(vo.BaseClaims)
 	userId := claims.Id
@@ -47,7 +47,7 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	path := global.GVA_CONFIG.File.VideoOutput
 	videoName := utils.GenerateFilename(username, userId)
 	fn := path + videoName + ".mp4"
-	
+
 	// 上传file文件到指定的文件路径fn
 	if err := c.SaveUploadedFile(file, fn); err != nil {
 		fmt.Println("存储视频失败, filePath,", fn)
@@ -86,16 +86,46 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
-	
+
 	response.OkWithMessage(c, "上传成功")
 }
 
 // VideoFeed 视频流接口
 func (api *VideoApi) VideoFeed(c *gin.Context) {
-	videoList := make([]*vo.Video, 1, 1)
-	user := vo.Author{Id: 1, Name: "charon", FollowCount: 0, FollowerCount: 1, IsFollow: false}
-	videoList[0] = &vo.Video{Id: 1, Author: &user, PlayUrl: "http://220.243.147.162:8080/videos/sss.mp4", CoverUrl: "http://220.243.147.162:8080/images/sss.jpg", FavoriteCount: 0, CommentCount: 0, IsFavorite: false}
-	data := vo.FeedResponseVo{NextTime: time.Now().Unix(), VideoList: videoList}
+	// 这个接口没有经过鉴权，所以要解析token
+	token := c.Query("token")
+	tokenId := int64(0)
+	// 登录了
+	if token != "" {
+		j := utils.NewJWT()
+		claims, err := j.ParseTokenRedis(token)
+		if err != nil {
+			response.FailWithMessage(c, err.Error())
+		}
+		tokenId = claims.BaseClaims.Id
+	}
+
+	var feed vo.FeedVo
+	if err := c.ShouldBind(&feed); err != nil {
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+
+	t := feed.LatestTime
+	if t == 0 {
+		t = time.Now().Unix()
+	}
+
+	// 获取视频流
+	videos, err := videoService.GetVideoFeed(tokenId, t)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
+
+	nextTime := videos[len(videos)-1].CreatedAt.Unix()
+
+	data := vo.FeedResponseVo{NextTime: nextTime, VideoList: videos}
 	response.OkWithData(c, data)
 }
 
