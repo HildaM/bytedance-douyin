@@ -6,4 +6,6 @@ var (
 	RejectRequestError   = NewErr("拒绝访问")
 	LoginExpired         = NewErr("登录状态已过期")
 	ParamValidationError = NewErr("参数校验失败")
+	RepeatedFollowError  = NewErr("重复关注")
+	UnfollowError        = NewErr("未关注，无法取消关注")
 )

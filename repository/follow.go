@@ -6,11 +6,10 @@ package repository
 
 import (
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
-	"errors"
-	"reflect"
 )
 
 type FollowDao struct{}
@@ -88,19 +87,90 @@ func (FollowDao) GetToUserIdList(userId int64) ([]int64, error) {
 //	FollowUser insert into t_follow
 // 1. 如果不存在，直接创建条目
 // 2. 如果表中已经存在条目，直接返回即可
+// 3. 用户表添加对应用户的follow_count
 func (FollowDao) FollowUser(followInfo bo.FollowBo) error {
 	// 1. 前置判断
 	var follow model.Follow
-	global.GVA_DB.Where("user_id = ? and to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Find(&follow)
-	if !reflect.DeepEqual(follow, model.Follow{}) {
-		return errors.New("已经关注过了，请勿重复操作")
+
+	tx := global.GVA_DB.Begin()
+
+	result := tx.Debug().Unscoped().Where("user_id = ? AND to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Find(&follow)
+	//fmt.Println(result.RowsAffected)
+	if result.Error != nil {
+		tx.Rollback()
+		return result.Error
 	}
 
-	// 2. 创建条目
-	if err := followUser(followInfo); err != nil {
+	// 已经关注过了
+	if result.RowsAffected == 1 && !follow.DeletedAt.Valid {
+		return exceptions.RepeatedFollowError
+	}
+
+	// 进行关注
+	// 1. 之前关注过被软删除
+	if result.RowsAffected == 1 && follow.DeletedAt.Valid {
+		err := tx.Debug().Unscoped().Model(&model.Follow{}).
+			Where("user_id = ? AND to_user_id = ?", followInfo.UserId, followInfo.ToUserId).
+			Update("deleted_at", nil).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// 2. 之前没关注过
+	if result.RowsAffected == 0 {
+		err := tx.Debug().Create(model.Follow{UserId: followInfo.UserId, ToUserId: followInfo.ToUserId}).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// to_user_id粉丝加一
+	err := GroupApp.UserDao.UserFollowerCountIncrement(followInfo.ToUserId, 1)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// user_id 关注加一
+	err = GroupApp.UserDao.UserFollowCountIncrement(followInfo.UserId, 1)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 	return nil
+	//err := tx.Debug().Where("user_id = ? and to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Find(&follow).Error
+	//if err != nil {
+	//	tx.Rollback()
+	//	return err
+	//}
+	//if !reflect.DeepEqual(follow, model.Follow{}) {
+	//	return errors.New("已经关注过了，请勿重复操作")
+	//}
+	//
+	//// 2. 创建条目
+	//f := model.Follow{
+	//	UserId:   followInfo.UserId,
+	//	ToUserId: followInfo.ToUserId,
+	//}
+	//err = tx.Debug().Create(&f).Error
+	//if err != nil {
+	//	tx.Rollback()
+	//	return err
+	//}
+
+	//if err := followUser(followInfo); err != nil {
+	//	return err
+	//}
+
+	//return nil
 }
 
 // followUser 第一次关注操作
@@ -112,6 +182,7 @@ func followUser(followInfo bo.FollowBo) error {
 	}
 
 	tx.Debug().Create(&follow)
+	//global.GVA_DB.Create(&follow)
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error
@@ -127,16 +198,55 @@ func followUser(followInfo bo.FollowBo) error {
 
 // UnFollowUser delete row from t_follow
 // 如果在已经关注的情况下，存在deleted_at。则先删除deleted_at条目，再将最新的关注标记为”软删除“。已达到更新软删除的目的
-// TODO 漏洞：如果在未关注情况下，连续调用两次这个方法，那么会将最后一个软删除删掉
+// 漏洞：如果在未关注情况下，连续调用两次这个方法，那么会将最后一个软删除删掉
 func (FollowDao) UnFollowUser(followInfo bo.FollowBo) error {
 	// 1. 前置判断
 	var follow model.Follow
-	global.GVA_DB.Unscoped().Where("user_id = ? and to_user_id = ? and deleted_at IS NOT NULL", followInfo.UserId, followInfo.ToUserId).Delete(&follow)
 
-	// 2. 取消关注
-	if err := unFollowUser(followInfo); err != nil {
+	tx := global.GVA_DB.Begin()
+
+	result := tx.Debug().Where("user_id = ? and to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Find(&follow)
+	//fmt.Println(result.RowsAffected)
+	if result.Error != nil {
+		tx.Rollback()
+		return result.Error
+	}
+	// 没关注
+	if result.RowsAffected == 0 {
+		tx.Rollback()
+		return exceptions.UnfollowError
+	}
+	// 关注了，取消关注
+	err := tx.Debug().Delete(&follow).Error
+	if err != nil {
+		tx.Rollback()
 		return err
 	}
+
+	// to_user_id 粉丝减一
+	err = GroupApp.UserDao.UserFollowerCountIncrement(followInfo.ToUserId, -1)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// user_id 关注减一
+	err = GroupApp.UserDao.UserFollowCountIncrement(followInfo.UserId, -1)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	//global.GVA_DB.Unscoped().Where("user_id = ? and to_user_id = ? and deleted_at IS NOT NULL", followInfo.UserId, followInfo.ToUserId).Delete(&follow)
+
+	// 2. 取消关注
+	//if err := unFollowUser(followInfo); err != nil {
+	//	return err
+	//}
 
 	return nil
 }

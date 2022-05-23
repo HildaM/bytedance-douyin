@@ -16,6 +16,7 @@ import (
  */
 type FollowApi struct{}
 
+// Follow 关注或取消关注
 func (api *FollowApi) Follow(c *gin.Context) {
 	var followInfo vo.FollowVo
 	if err := c.ShouldBind(&followInfo); err != nil {

@@ -95,3 +95,24 @@ func (UserDao) QueryUserByNameAndPassword(userBo bo.UserBo) (int64, error) {
 	}
 	return user.ID, nil
 }
+
+// UserFollowerCountIncrement 用户的follower_count加一
+func (UserDao) UserFollowerCountIncrement(userId int64, incr int) error {
+	var user model.UserDao
+
+	err := global.GVA_DB.Model(&user).Where("id = ?", userId).UpdateColumn("follower_count", gorm.Expr("follower_count + ?", incr)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (UserDao) UserFollowCountIncrement(userId int64, incr int) error {
+	var user model.UserDao
+
+	err := global.GVA_DB.Model(&user).Where("id = ?", userId).UpdateColumn("follow_count", gorm.Expr("follow_count + ?", incr)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
