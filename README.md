@@ -26,3 +26,7 @@
 
 vo -> bo -> dao
 vo <- bo <- dao
+
+## 进展
+项目所有功能已基本完成。如需使用，请修改resource目录下的config.yaml的参数，然后安装好ffmepg，方能运行
+原项目地址在gitee，此处仅仅为本人GitHub更新所用，项目最新进展在gitee上。
