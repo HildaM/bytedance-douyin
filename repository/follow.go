@@ -94,6 +94,20 @@ func (FollowDao) GetToUserIdList(userId int64) ([]int64, error) {
 	return toUserIdList, nil
 }
 
+// GetToUserIdList2
+func (FollowDao) GetToUserIdList2(userId int64) ([]int64, error) {
+	rdb := global.GVA_REDIS
+	userKey := FOLLOWER_SET_KEY + strconv.FormatInt(userId, 10)
+
+	res := rdb.SMembers(context.Background(), userKey)
+	if res.Err() != nil {
+		return []int64{}, res.Err()
+	}
+
+	toUserList := utils.String2Int64(res.Val())
+	return toUserList, nil
+}
+
 //	FollowUser insert into t_follow
 // 1. 如果不存在，直接创建条目
 // 2. 如果表中已经存在条目，直接返回即可
@@ -336,17 +350,52 @@ func (FollowDao) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, 
 }
 
 // GetFanList2 获取粉丝列表
-// TODO 由于redis中存储的是用户的id，所以获取到id集合后，还需要用id在数据库中查找对应的用户
+// 由于redis中存储的是用户的id，所以获取到id集合后，还需要用id在数据库中查找对应的用户
 func (FollowDao) GetFanList2(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
-	//rdb := global.GVA_REDIS
+	rdb := global.GVA_REDIS
+	ctx := context.Background()
 	var fansList vo.FollowerResponseVo
-	//var fans []*vo.UserInfo
+	var fans []*vo.UserInfo
 
-	//userId := strconv.FormatInt(userInfo.UserId, 10)
-	//tokenId := strconv.FormatInt(userInfo.TokenId, 10)
-	//followerKey := FOLLOWER_SET_KEY + userId
-	//followeeKey := FOLLOWEE_SET_KEY + tokenId
+	// 0. init value
+	userId := strconv.FormatInt(userInfo.UserId, 10) // 被访问的用户，有可能不是token用户
+	// tokenId := strconv.FormatInt(userInfo.TokenId, 10)		// tokenId指代的是当前操作的用户
+	followeeKey := FOLLOWEE_SET_KEY + userId
+	followerKey := FOLLOWER_SET_KEY + userId
 
+	// 1. 获取指定用户user的粉丝列表
+	result := rdb.SMembers(ctx, followeeKey)
+	if result.Err() != nil {
+		return fansList, result.Err()
+	}
+
+	fansIds := utils.String2Int64(result.Val())
+	userFans, err := UserDao{}.GetUsers(fansIds)
+	if err != nil {
+		return fansList, err
+	}
+
+	// 2. 判断user粉丝是否关注了user自己
+	for _, u := range userFans {
+		// 互关判断
+		res := rdb.SIsMember(ctx, followerKey, string(u.ID))
+		if res.Err() != nil {
+			return fansList, res.Err()
+		}
+		isFollow := res.Val()
+
+		fan := vo.UserInfo{
+			Id:            u.ID,
+			Name:          u.Name,
+			FollowCount:   u.FollowCount,
+			FollowerCount: u.FollowerCount,
+			IsFollow:      isFollow,
+		}
+
+		fans = append(fans, &fan)
+	}
+
+	fansList.UserList = fans
 	return fansList, nil
 }
 
@@ -360,6 +409,19 @@ func (FollowDao) GetFanCount(followInfo bo.FollowBo) (int64, error) {
 	}
 
 	return count, nil
+}
+
+// GetFanCount 获取粉丝数目
+func (FollowDao) GetFanCount2(followInfo bo.FollowBo) (int64, error) {
+	rdb := global.GVA_REDIS
+	followerKey := FOLLOWEE_SET_KEY + strconv.FormatInt(followInfo.UserId, 10)
+
+	res := rdb.SCard(context.Background(), followerKey)
+	if res.Err() != nil {
+		return 0, res.Err()
+	}
+
+	return res.Val(), nil
 }
 
 func (FollowDao) GetFollowUserIdByUserId(userId int64, toUserIdList []int64) (map[int64]bool, error) {
@@ -376,5 +438,29 @@ func (FollowDao) GetFollowUserIdByUserId(userId int64, toUserIdList []int64) (ma
 		followMap[v] = true
 	}
 	return followMap, nil
+}
 
+// GetFollowUserIdByUserId2 根据userId获取关注列表的映射
+func (FollowDao) GetFollowUserIdByUserId2(userId int64, toUserIdList []int64) (map[int64]bool, error) {
+	rdb := global.GVA_REDIS
+	userKey := FOLLOWER_SET_KEY + strconv.FormatInt(userId, 10)
+
+	// SMembersMap：把集合里的元素转换成map的key
+	// map[100:{} 200:{} 300:{} 400:{} 500:{} 600:{}]  相当于转换为一个set
+	res := rdb.SMembersMap(context.Background(), userKey)
+	if res.Err() != nil {
+		return map[int64]bool{}, res.Err()
+	}
+
+	toUserIdSet := res.Val()
+	followMap := make(map[int64]bool, len(toUserIdSet))
+	for _, toUserId := range toUserIdList {
+		// 如果toUserId存在与user的关注列表中
+		// 注意Set的key是string类型！
+		if _, ok := toUserIdSet[strconv.FormatInt(toUserId, 10)]; ok == true {
+			followMap[toUserId] = true
+		}
+	}
+
+	return followMap, nil
 }
