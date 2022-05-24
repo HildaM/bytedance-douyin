@@ -10,44 +10,17 @@ import (
 	"bytedance-douyin/global"
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
+	"bytedance-douyin/utils"
+	"context"
+	"strconv"
+)
+
+const (
+	FOLLOWER_SET_KEY = "follower:user:"
+	FOLLOWEE_SET_KEY = "followee:user:"
 )
 
 type FollowDao struct{}
-
-//Deprecated
-func (dao FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
-	var followList vo.FollowResponseVo
-
-	//	1. userId --> to_userId list
-	toUserIdList, err := dao.GetToUserIdList(userId)
-	if err != nil {
-		return followList, err
-	}
-
-	//	2. to_userId list --> user list
-	// select user from t_user where id in (?)
-	var userDao UserDao
-	users, err := userDao.GetUsers(toUserIdList)
-	if err != nil {
-		return followList, err
-	}
-
-	var userList []*vo.UserInfo
-	for _, user := range users {
-		userInfo := vo.UserInfo{
-			Id:            user.ID,
-			Name:          user.Name,
-			FollowCount:   user.FollowCount,
-			FollowerCount: user.FollowerCount,
-			IsFollow:      true,
-		}
-
-		userList = append(userList, &userInfo)
-	}
-	followList.UserList = userList
-
-	return followList, nil
-}
 
 // GetFollowList pass
 func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
@@ -62,6 +35,43 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	).Scan(&follows).Error
 	if err != nil {
 		return followList, err
+	}
+
+	followList.UserList = follows
+	return followList, nil
+}
+
+// GetFollowList use redis to refactor
+func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
+	var followList vo.FollowResponseVo
+	var follows []*vo.UserInfo
+
+	userKey := FOLLOWER_SET_KEY + strconv.FormatInt(userId, 10)
+	rdb := global.GVA_REDIS
+	ctx := context.Background()
+
+	// 1. 从redis中获取关注者的id
+	res := rdb.SMembers(ctx, userKey)
+	if res.Err() != nil {
+		return followList, res.Err()
+	}
+	followerIds := utils.String2Int64(res.Val())
+
+	// 2. 获取关注者
+	followers, err := UserDao{}.GetUsers(followerIds)
+	if err != nil {
+		return followList, nil
+	}
+
+	for _, u := range followers {
+		userInfo := vo.UserInfo{
+			Id:            u.ID,
+			Name:          u.Name,
+			FollowCount:   u.FollowCount,
+			FollowerCount: u.FollowerCount,
+			IsFollow:      true,
+		}
+		follows = append(follows, &userInfo)
 	}
 
 	followList.UserList = follows
@@ -146,51 +156,40 @@ func (FollowDao) FollowUser(followInfo bo.FollowBo) error {
 		return err
 	}
 	return nil
-	//err := tx.Debug().Where("user_id = ? and to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Find(&follow).Error
-	//if err != nil {
-	//	tx.Rollback()
-	//	return err
-	//}
-	//if !reflect.DeepEqual(follow, model.Follow{}) {
-	//	return errors.New("已经关注过了，请勿重复操作")
-	//}
-	//
-	//// 2. 创建条目
-	//f := model.Follow{
-	//	UserId:   followInfo.UserId,
-	//	ToUserId: followInfo.ToUserId,
-	//}
-	//err = tx.Debug().Create(&f).Error
-	//if err != nil {
-	//	tx.Rollback()
-	//	return err
-	//}
-
-	//if err := followUser(followInfo); err != nil {
-	//	return err
-	//}
-
-	//return nil
 }
 
-// followUser 第一次关注操作
-func followUser(followInfo bo.FollowBo) error {
-	tx := global.GVA_DB.Begin()
-	follow := model.Follow{
-		UserId:   followInfo.UserId,
-		ToUserId: followInfo.ToUserId,
+// FollowUser use redis to refactor this function
+func (FollowDao) FollowUser2(followInfo bo.FollowBo) error {
+	rdb := global.GVA_REDIS
+	ctx := context.Background()
+
+	userId := strconv.FormatInt(followInfo.UserId, 10)
+	toUserId := strconv.FormatInt(followInfo.ToUserId, 10)
+	followerKey := FOLLOWER_SET_KEY + userId
+	followeeKey := FOLLOWEE_SET_KEY + toUserId
+
+	// 1. 前置判断
+	result := rdb.SIsMember(ctx, followerKey, toUserId)
+	if result.Err() != nil {
+		return result.Err()
 	}
 
-	tx.Debug().Create(&follow)
-	//global.GVA_DB.Create(&follow)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	// 如果已经关注了，退出即可
+	if result.Val() == true {
+		return exceptions.RepeatedFollowError
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		return tx.Error
+	// 2. 关注操作，将关注的信息写入到redis服务器中
+	// user关注
+	res := rdb.SAdd(ctx, followerKey, toUserId)
+	if res.Err() != nil || res.Val() <= 0 {
+		return res.Err()
+	}
+
+	// 更新对方粉丝的列表
+	res = rdb.SAdd(ctx, followeeKey, userId)
+	if res.Err() != nil || res.Val() <= 0 {
+		return res.Err()
 	}
 
 	return nil
@@ -251,23 +250,37 @@ func (FollowDao) UnFollowUser(followInfo bo.FollowBo) error {
 	return nil
 }
 
-func unFollowUser(followInfo bo.FollowBo) error {
-	tx := global.GVA_DB.Begin()
+// UnFollowUser use redis to refactor this function
+func (FollowDao) UnFollowUser2(followInfo bo.FollowBo) error {
+	rdb := global.GVA_REDIS
+	ctx := context.Background()
 
-	unFollow := model.Follow{
-		UserId:   followInfo.UserId,
-		ToUserId: followInfo.ToUserId,
+	userId := strconv.FormatInt(followInfo.UserId, 10)
+	toUserId := strconv.FormatInt(followInfo.ToUserId, 10)
+	followerKey := FOLLOWER_SET_KEY + userId
+	followeeKey := FOLLOWEE_SET_KEY + toUserId
+
+	// 1. 前置判断
+	result := rdb.SIsMember(ctx, followerKey, toUserId)
+	if result.Err() != nil {
+		return result.Err()
+	}
+	// 没关注
+	if result.Val() == false {
+		return exceptions.UnfollowError
 	}
 
-	tx.Debug().Where("user_id = ? and to_user_id = ?", followInfo.UserId, followInfo.ToUserId).Delete(&unFollow)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	// 2. 取消关注
+	// user取消关注
+	res := rdb.SRem(ctx, followerKey, toUserId)
+	if res.Err() != nil || res.Val() <= 0 {
+		return res.Err()
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		return tx.Error
+	// 对方粉丝列表移除
+	res = rdb.SRem(ctx, followeeKey, userId)
+	if res.Err() != nil || res.Val() <= 0 {
+		return res.Err()
 	}
 
 	return nil
@@ -283,6 +296,19 @@ func (FollowDao) GetFollowCount(followInfo bo.FollowBo) (int64, error) {
 	}
 
 	return count, nil
+}
+
+// GetFollowCount2
+func (FollowDao) GetFollowCount2(followInfo bo.FollowBo) (int64, error) {
+	rdb := global.GVA_REDIS
+	followerKey := FOLLOWER_SET_KEY + strconv.FormatInt(followInfo.UserId, 10)
+
+	res := rdb.SCard(context.Background(), followerKey)
+	if res.Err() != nil {
+		return 0, res.Err()
+	}
+
+	return res.Val(), nil
 }
 
 // GetFanList 获取粉丝列表
@@ -306,6 +332,21 @@ func (FollowDao) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, 
 	}
 
 	fansList.UserList = fans
+	return fansList, nil
+}
+
+// GetFanList2 获取粉丝列表
+// TODO 由于redis中存储的是用户的id，所以获取到id集合后，还需要用id在数据库中查找对应的用户
+func (FollowDao) GetFanList2(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
+	//rdb := global.GVA_REDIS
+	var fansList vo.FollowerResponseVo
+	//var fans []*vo.UserInfo
+
+	//userId := strconv.FormatInt(userInfo.UserId, 10)
+	//tokenId := strconv.FormatInt(userInfo.TokenId, 10)
+	//followerKey := FOLLOWER_SET_KEY + userId
+	//followeeKey := FOLLOWEE_SET_KEY + tokenId
+
 	return fansList, nil
 }
 
