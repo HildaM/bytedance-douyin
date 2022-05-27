@@ -41,7 +41,7 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 	return followList, nil
 }
 
-// GetFollowList use redis to refactor
+// GetFollowList2 use redis to refactor
 func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 	var follows []*vo.UserInfo
@@ -58,7 +58,7 @@ func (FollowDao) GetFollowList2(userId int64) (vo.FollowResponseVo, error) {
 	followerIds := utils.String2Int64(res.Val())
 
 	// 2. 获取关注者
-	followers, err := UserDao{}.GetUsers(followerIds)
+	followers, err := GroupApp.UserDao.GetUsers(followerIds)
 	if err != nil {
 		return followList, nil
 	}
@@ -172,7 +172,7 @@ func (FollowDao) FollowUser(followInfo bo.FollowBo) error {
 	return nil
 }
 
-// FollowUser use redis to refactor this function
+// FollowUser2 use redis to refactor this function
 func (FollowDao) FollowUser2(followInfo bo.FollowBo) error {
 	rdb := global.GVA_REDIS
 	ctx := context.Background()
@@ -411,7 +411,7 @@ func (FollowDao) GetFanCount(followInfo bo.FollowBo) (int64, error) {
 	return count, nil
 }
 
-// GetFanCount 获取粉丝数目
+// GetFanCount2 获取粉丝数目
 func (FollowDao) GetFanCount2(followInfo bo.FollowBo) (int64, error) {
 	rdb := global.GVA_REDIS
 	followerKey := FOLLOWEE_SET_KEY + strconv.FormatInt(followInfo.UserId, 10)

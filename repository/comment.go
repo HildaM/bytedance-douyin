@@ -40,14 +40,15 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 	return nil
 }
 
-func (CommentDao) PostComment(post bo.CommentPost) error {
-	comment := model.Comment{
+func (CommentDao) PostComment(post bo.CommentPost) (model.Comment, error) {
+	var comment model.Comment
+	comment = model.Comment{
 		VideoId: post.VideoId,
 		UserId:  post.UserId,
 		Content: post.CommentText,
 	}
 	if result := global.GVA_DB.Create(&comment); result.Error != nil {
-		return result.Error
+		return comment, result.Error
 	}
-	return nil
+	return comment, nil
 }

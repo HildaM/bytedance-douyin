@@ -18,22 +18,27 @@ import (
  */
 
 const (
-	POST = 1
+	POST   = 1
 	DELETE = 2
 )
 
 type CommentApi struct{}
 
+// CommentOPS 添加评论或删除评论
 func (api *CommentApi) CommentOPS(c *gin.Context) {
 	request := vo.CommentActionRequest{}
 	if err := c.ShouldBind(&request); err != nil {
-		response.FailWithMessage(c, fmt.Sprintf("%s", err))
+		response.FailWithMessage(c, err.Error())
 		return
 	}
 	var err error
+	var comment vo.Comment
+	data := vo.CommentActionResponseVo{}
 	if request.ActionType == POST {
+		// 添加评论
 		commentPost := bo.CommentPost{UserId: request.UserId, VideoId: request.VideoId, CommentText: request.CommentText}
-		err = commentService.PostComment(commentPost)
+		comment, err = commentService.PostComment(commentPost)
+
 	} else if request.ActionType == DELETE {
 		commentDelete := bo.CommentDelete{UserId: request.UserId, VideoId: request.VideoId, CommentId: request.CommentId}
 		err = commentService.DeleteComment(commentDelete)
@@ -42,7 +47,22 @@ func (api *CommentApi) CommentOPS(c *gin.Context) {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
-	response.OkWithMessage(c, "操作成功")
+	// 添加评论返回评论信息
+	if request.ActionType == POST {
+		info, err := userService.GetUserInfo(vo.UserInfoVo{UserId: request.UserId, MyUserId: request.UserId})
+		if err != nil {
+			response.FailWithMessage(c, err.Error())
+			return
+		}
+		comment.User = vo.UserInfo{Id: info.Id,
+			Name:          info.Name,
+			FollowCount:   info.FollowCount,
+			FollowerCount: info.FollowerCount,
+			IsFollow:      info.Follow,
+		}
+		data.Comment = comment
+	}
+	response.OkWithDetailed(c, "操作成功", data)
 }
 
 func (api *CommentApi) CommentList(c *gin.Context) {

@@ -10,14 +10,18 @@ import (
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 验证请求是否携带token
-		token := ""
-		switch c.Request.Method {
-		case "GET":
-			token = c.Query("token")
-		case "POST":
-			// TODO BUG220516: post请求中，token也是放在query中的，只有在上传视频接口放在表单中
+		//token := ""
+		token := c.Query("token")
+		if c.FullPath() == utils.VideoPostPath {
 			token = c.PostForm("token")
 		}
+		//switch c.Request.Method {
+		//case "GET":
+		//	token = c.Query("token")
+		//case "POST":
+		// TODO BUG220516: post请求中，token也是放在query中的，只有在上传视频接口放在表单中
+		//	token = c.PostForm("token")
+		//}
 		// todo 为了方便测试，token为fangkaiwo时通过身份验证。
 		if token == "fangkaiwo" {
 			c.Next()

@@ -2,7 +2,7 @@ package vo
 
 import "bytedance-douyin/types"
 
-// 评论、删除评论
+// CommentActionRequest 评论、删除评论
 type CommentActionRequest struct {
 	UserId      int64  `form:"user_id" binding:"required"`
 	VideoId     int64  `form:"video_id" binding:"required"`
@@ -11,19 +11,23 @@ type CommentActionRequest struct {
 	CommentId   int64  `form:"comment_id"`
 }
 
-// 评论列表
+// CommentListRequest 评论列表
 type CommentListRequest struct {
-	UserId  int64  `form:"user_id" binding:"required"`
-	VideoId int64  `form:"video_id" binding:"required"`
+	UserId  int64 `form:"user_id" binding:"required"`
+	VideoId int64 `form:"video_id" binding:"required"`
 }
 
 type Comment struct {
-	Id         int64     `json:"id"`
-	User       UserInfo `json:"user"`
-	Content    string    `json:"content"`
-	CreateDate types.Time    `json:"create_date"`
+	Id         int64      `json:"id"`
+	User       UserInfo   `json:"user"`
+	Content    string     `json:"content"`
+	CreateDate types.Time `json:"create_date" time_format:"06-02"`
 }
 
 type CommentResponseVo struct {
 	CommentList []Comment `json:"comment_list" binding:"required"`
+}
+
+type CommentActionResponseVo struct {
+	Comment Comment `json:"comment"`
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/service/bo"
+	"bytedance-douyin/types"
 )
 
 /**
@@ -12,7 +13,7 @@ import (
  * @Version: 1.0.0
  * @Date: 2022/5/12 16:36
  */
-type CommentService struct {}
+type CommentService struct{}
 
 func (CommentService) GetCommentList(userId, videoId int64) (*[]vo.Comment, error) {
 	list, err := commentDao.GetCommentList(videoId)
@@ -27,8 +28,8 @@ func (CommentService) GetCommentList(userId, videoId int64) (*[]vo.Comment, erro
 	}
 	for _, v := range *list {
 		comment := vo.Comment{
-			Id:         v.ID,
-			User:       vo.UserInfo{
+			Id: v.ID,
+			User: vo.UserInfo{
 				Id:            v.User.Id,
 				Name:          v.User.Name,
 				FollowCount:   v.User.FollowCount,
@@ -50,9 +51,17 @@ func (s CommentService) DeleteComment(commentDelete bo.CommentDelete) error {
 	return nil
 }
 
-func (s CommentService) PostComment(post bo.CommentPost) error {
-	if err := commentDao.PostComment(post); err != nil {
-		return err
+// PostComment 添加评论
+func (s CommentService) PostComment(post bo.CommentPost) (vo.Comment, error) {
+	var comment vo.Comment
+	commentPosted, err := commentDao.PostComment(post)
+	if err != nil {
+		return comment, err
 	}
-	return nil
+	comment = vo.Comment{
+		Id:         commentPosted.ID,
+		Content:    commentPosted.Content,
+		CreateDate: types.Time(commentPosted.CreatedAt),
+	}
+	return comment, nil
 }
