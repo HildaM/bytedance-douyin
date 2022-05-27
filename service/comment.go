@@ -15,35 +15,40 @@ import (
  */
 type CommentService struct{}
 
-func (CommentService) GetCommentList(userId, videoId int64) (*[]vo.Comment, error) {
+// GetCommentList 获取评论列表
+func (CommentService) GetCommentList(userId, videoId int64) ([]vo.Comment, error) {
 	list, err := commentDao.GetCommentList(videoId)
 	if err != nil {
 		return nil, err
 	}
-	res := make([]vo.Comment, 0)
-	followList, _ := followDao.GetToUserIdList(userId)
-	followMap := make(map[int64]bool)
+
+	// 获取评论用户的id
+	followList, _ := followDao.GetToUserIdListByRedis(userId)
+	followMap := make(map[int64]bool, len(followList))
 	for _, v := range followList {
 		followMap[v] = true
 	}
-	for _, v := range *list {
+
+	res := make([]vo.Comment, len(list))
+	for i, v := range list {
 		comment := vo.Comment{
 			Id: v.ID,
 			User: vo.UserInfo{
-				Id:            v.User.Id,
+				Id:            v.User.ID,
 				Name:          v.User.Name,
 				FollowCount:   v.User.FollowCount,
 				FollowerCount: v.User.FollowerCount,
-				IsFollow:      followMap[v.User.Id],
+				IsFollow:      followMap[v.User.ID],
 			},
 			Content:    v.Content,
-			CreateDate: v.CreateDate,
+			CreateDate: types.Time(v.CreatedAt),
 		}
-		res = append(res, comment)
+		res[i] = comment
 	}
-	return &res, nil
+	return res, nil
 }
 
+// DeleteComment 删除评论
 func (s CommentService) DeleteComment(commentDelete bo.CommentDelete) error {
 	if err := commentDao.DeleteComment(commentDelete.CommentId); err != nil {
 		return err

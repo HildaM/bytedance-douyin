@@ -4,7 +4,6 @@ import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/service/bo"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -40,6 +39,7 @@ func (api *CommentApi) CommentOPS(c *gin.Context) {
 		comment, err = commentService.PostComment(commentPost)
 
 	} else if request.ActionType == DELETE {
+		// 删除评论
 		commentDelete := bo.CommentDelete{UserId: request.UserId, VideoId: request.VideoId, CommentId: request.CommentId}
 		err = commentService.DeleteComment(commentDelete)
 	}
@@ -73,6 +73,6 @@ func (api *CommentApi) CommentList(c *gin.Context) {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
-	fmt.Println(list)
-	response.OkWithData(c, vo.CommentResponseVo{CommentList: *list})
+
+	response.OkWithData(c, vo.CommentResponseVo{CommentList: list})
 }

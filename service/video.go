@@ -48,7 +48,7 @@ func (VideoService) GetVideoList(userId, myId int64) ([]vo.Video, error) {
 	//		return
 	//	}
 	//
-	//	count, followErr = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
+	//	count, followErr = GroupApp.FollowService.GetIsFollow(vo.FollowVo{UserId: myId, ToUserId: userId})
 	//	if count != 0 {
 	//		isFollow = true
 	//	}
@@ -208,7 +208,8 @@ func handleFollowCondition(videos []model.Video, userId int64) ([]vo.Video, erro
 		// 查询用户是否关注
 		go func() {
 			defer wg.Done()
-			followUserMap, err1 = followDao.GetFollowUserIdByUserId(userId, toUserIdList)
+			//followUserMap, err1 = followDao.GetFollowUserIdByUserId(userId, toUserIdList)
+			followUserMap, err1 = followDao.GetFollowUserIdByUserIdByRedis(userId, toUserIdList)
 		}()
 
 		// 查询视频是否点赞

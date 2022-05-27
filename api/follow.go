@@ -40,14 +40,7 @@ func (api *FollowApi) Follow(c *gin.Context) {
 	r.OkWithMessage(c, action+"成功")
 }
 
-//
-//  FollowList
-//  @Description:	获取关注列表
-//  @receiver api
-//  @param c
-//	@Request body:	user_id, token
-// 	@Author Quan
-//
+// FollowList 获取关注列表
 func (api *FollowApi) FollowList(c *gin.Context) {
 	var userInfo vo.FollowListVo
 	if err := c.ShouldBind(&userInfo); err != nil {

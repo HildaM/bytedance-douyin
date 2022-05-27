@@ -11,6 +11,7 @@ type Comment struct {
 	Base
 	VideoId int64
 	UserId  int64
+	User    UserDao `gorm:"foreignKey:UserId"`
 	Content string
 }
 

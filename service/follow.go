@@ -5,7 +5,6 @@ package service
 
 import (
 	"bytedance-douyin/api/vo"
-	"bytedance-douyin/global"
 	"bytedance-douyin/service/bo"
 )
 
@@ -29,7 +28,7 @@ func (FollowService) GetFollowList(userInfo vo.FollowListVo) (vo.FollowResponseV
 	//	根据user_id获取userList
 	userId := userInfo.UserId
 	var err error
-	followedUserList, err = followDao.GetFollowList(userId)
+	followedUserList, err = followDao.GetFollowListByRedis(userId)
 	if err != nil {
 		return followedUserList, err
 	}
@@ -54,27 +53,28 @@ func (FollowService) FollowOrNot(followInfo vo.FollowVo) (int8, error) {
 		err = followDao.UnFollowUser(followBo)
 	}
 	if err != nil {
-		global.GVA_LOG.Error(err.Error())
+		//global.GVA_LOG.Error(err.Error())
 		return 0, err
 	}
 
 	return action, nil
 }
 
-// GetFollowCount 获取关注数
-func (FollowService) GetFollowCount(followInfo vo.FollowVo) (int64, error) {
+// GetIsFollow 获取是否关注
+func (FollowService) GetIsFollow(followInfo vo.FollowVo) (bool, error) {
 	followBo := bo.FollowBo{
 		UserId:   followInfo.UserId,
 		ToUserId: followInfo.ToUserId,
 	}
 
-	count, err := followDao.GetFollowCount(followBo)
+	//isFollow, err := followDao.GetIsFollow(followBo)
+	isFollow, err := followDao.GetIsFollowByRedis(followBo)
 	if err != nil {
-		global.GVA_LOG.Error(err.Error())
-		return 0, err
+		//global.GVA_LOG.Error(err.Error())
+		return isFollow, err
 	}
 
-	return count, nil
+	return isFollow, nil
 }
 
 // GetFanList 获取粉丝列表
@@ -82,9 +82,10 @@ func (FollowerService) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerRespon
 	var fanList vo.FollowerResponseVo
 	var err error
 
-	fanList, err = followDao.GetFanList(userInfo)
+	//fanList, err = followDao.GetFanList(userInfo)
+	fanList, err = followDao.GetFanListByRedis(userInfo)
 	if err != nil {
-		global.GVA_LOG.Error(err.Error())
+		//global.GVA_LOG.Error(err.Error())
 		return fanList, err
 	}
 
@@ -100,7 +101,7 @@ func (FollowerService) GetFanCount(followInfo vo.FollowVo) (int64, error) {
 
 	count, err := followDao.GetFanCount(followBo)
 	if err != nil {
-		global.GVA_LOG.Error(err.Error())
+		//global.GVA_LOG.Error(err.Error())
 		return count, err
 	}
 

@@ -16,16 +16,16 @@ import (
  */
 type CommentDao struct{}
 
-func (CommentDao) GetCommentList(videoId int64) (*[]bo.Comment, error) {
-	comments := make([]bo.Comment, 0)
-	result := global.GVA_DB.Model(&model.Comment{}).Preload("User", func(db *gorm.DB) *gorm.DB {
+func (CommentDao) GetCommentList(videoId int64) ([]model.Comment, error) {
+	comments := make([]model.Comment, 0)
+	result := global.GVA_DB.Preload("User", func(db *gorm.DB) *gorm.DB {
 		return db.Table(model.UserDao{}.TableName())
 	}).Where("video_id = ?", videoId).Find(&comments)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &comments, nil
+	return comments, nil
 }
 
 func (CommentDao) DeleteComment(CommentId int64) error {

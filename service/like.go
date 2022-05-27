@@ -34,7 +34,7 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 	//	}
 	//	// 获取is_follow
 	//	isFollow := true
-	//	count, err := followDao.GetFollowCount(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
+	//	count, err := followDao.GetIsFollow(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
 	//	if err != nil {
 	//		return favoriteVideoList, err
 	//	}
