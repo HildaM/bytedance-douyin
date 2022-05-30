@@ -23,6 +23,14 @@ func (api *LikeApi) Like(c *gin.Context) {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
+
+	tokenId, ok := c.Get("tokenId")
+	if !ok {
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+	likeInfo.UserId = tokenId.(int64)
+
 	code, err := likeService.LikeOrCancel(likeInfo)
 	if err != nil {
 		r.FailWithMessage(c, err.Error())

@@ -74,7 +74,7 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	// replace .mp4 to .jpg
 	imageName := videoName[:len(videoName)-4] + ".jpg"
 	url := imagePath + imageName
-	if err := imaging.Save(img, url); err != nil {
+	if err = imaging.Save(img, url); err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
@@ -101,28 +101,34 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 // VideoFeed 视频流接口
 func (api *VideoApi) VideoFeed(c *gin.Context) {
 	// 这个接口没有经过鉴权，所以要解析token
-	token := c.Query("token")
-	tokenId := int64(0)
-	// 登录了
-	if token != "" {
-		j := utils.NewJWT()
-		claims, err := j.ParseTokenRedis(token)
-		if err != nil {
-			response.FailWithMessage(c, err.Error())
-			return
-		}
-		tokenId = claims.BaseClaims.Id
+	//token := c.Query("token")
+	//tokenId := int64(0)
+	//// 登录了
+	//if token != "" {
+	//	j := utils.NewJWT()
+	//	claims, err := j.ParseTokenRedis(token)
+	//	if err != nil {
+	//		response.FailWithMessage(c, err.Error())
+	//		return
+	//	}
+	//	tokenId = claims.BaseClaims.Id
+	//}
+	j := utils.NewJWT()
+	tokenId, err := j.CheckTokenWithoutLogin(c)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
 	}
 
 	var feed vo.FeedVo
-	if err := c.ShouldBind(&feed); err != nil {
+	if err = c.ShouldBind(&feed); err != nil {
 		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
 
 	t := feed.LatestTime
 	if t == 0 {
-		t = time.Now().Unix()
+		t = utils.NowTimestamp()
 	}
 
 	// 获取视频流
@@ -132,9 +138,13 @@ func (api *VideoApi) VideoFeed(c *gin.Context) {
 		return
 	}
 
-	nextTime := videos[len(videos)-1].CreatedAt.Unix()
+	data := vo.FeedResponseVo{NextTime: utils.NowDurationTimestamp(10 * time.Second), VideoList: videos}
 
-	data := vo.FeedResponseVo{NextTime: nextTime, VideoList: videos}
+	if len(videos) != 0 {
+		nextTime := videos[len(videos)-1].CreatedAt.UnixMilli()
+		data.NextTime = nextTime
+	}
+	fmt.Println(data)
 	response.OkWithData(c, data)
 }
 

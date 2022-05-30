@@ -4,7 +4,7 @@ import "time"
 
 // FavoriteActionVo 点赞操作
 type FavoriteActionVo struct {
-	UserId     int64  `form:"user_id" binding:"required"`
+	UserId     int64  `form:"user_id"`
 	Token      string `form:"token" binding:"required"`
 	VideoId    int64  `form:"video_id" binding:"required"`
 	ActionType int8   `form:"action_type" binding:"required,oneof=1 2"`

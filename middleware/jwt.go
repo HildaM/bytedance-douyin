@@ -15,6 +15,7 @@ func JWTAuth() gin.HandlerFunc {
 		if c.FullPath() == utils.VideoPostPath {
 			token = c.PostForm("token")
 		}
+		//fmt.Println(token)
 		// todo 为了方便测试，token为fangkaiwo时通过身份验证。
 		if token == "fangkaiwo" {
 			c.Next()

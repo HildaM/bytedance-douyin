@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"bytedance-douyin/api"
 	"bytedance-douyin/global"
 	"bytedance-douyin/middleware"
 	"bytedance-douyin/router"
@@ -37,16 +38,22 @@ func Routers() *gin.Engine {
 
 	// 方便统一添加路由组前缀 多服务器上线使用
 	PublicGroup := Router.Group("douyin")
+
 	{
 		// 不做鉴权
 		router.InitBaseUserRouter(PublicGroup)  // 注册、登录
 		router.InitVideoFeedRouter(PublicGroup) // 视频流
-		router.InitFollowRouter(PublicGroup)
+		relationRouter := router.InitRelationRouter(PublicGroup)
+		router.InitFollowRouter(relationRouter)
 	}
+
 	PrivateGroup := Router.Group("douyin")
 	PrivateGroup.Use(middleware.JWTAuth()) //.Use(middleware.CasbinHandler())
 	{
 		// 鉴权
+		// 关注操作需鉴权
+		relationRouter := router.InitRelationRouter(PrivateGroup)
+		relationRouter.POST("action/", api.GroupApp.FollowApi.Follow)
 		router.InitUserInfoRouter(PrivateGroup) // 查看用户信息
 		router.InitVideoRouter(PrivateGroup)
 		router.InitCommentRouter(PrivateGroup)

@@ -48,9 +48,9 @@ func (FollowService) FollowOrNot(followInfo vo.FollowVo) (int8, error) {
 	action := followInfo.ActionType
 	switch action {
 	case FOLLOW:
-		err = followDao.FollowUser(followBo)
+		err = followDao.FollowUserByRedis(followBo)
 	case UNFOLLOW:
-		err = followDao.UnFollowUser(followBo)
+		err = followDao.UnFollowUserByRedis(followBo)
 	}
 	if err != nil {
 		//global.GVA_LOG.Error(err.Error())

@@ -4,7 +4,7 @@ import "bytedance-douyin/types"
 
 // CommentActionRequest 评论、删除评论
 type CommentActionRequest struct {
-	UserId      int64  `form:"user_id" binding:"required"`
+	UserId      int64  `form:"user_id"`
 	VideoId     int64  `form:"video_id" binding:"required"`
 	ActionType  int8   `form:"action_type" binding:"required,oneof=1 2"`
 	CommentText string `form:"comment_text"`

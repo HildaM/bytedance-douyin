@@ -80,6 +80,13 @@ func (LikeDao) LikeVideo(likedInfo bo.VideoLikedBo) error {
 		tx.Rollback()
 		return tx.Error
 	}
+
+	err := GroupApp.VideoDao.VideoFavoriteCountIncr(likedInfo.VideoId, 1)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	//lock.Lock()
 	////根据video_id查询视频，获得video信息
 	//video, err := videoDao.GetVideoById(likedInfo.VideoId)
@@ -99,9 +106,9 @@ func (LikeDao) LikeVideo(likedInfo bo.VideoLikedBo) error {
 	//用户若有获赞数量，则根据video author查用户表，再在获赞数量字段+1
 	//video中favorite_count字段+1
 
-	if err := tx.Commit().Error; err != nil {
+	if err = tx.Commit().Error; err != nil {
 		tx.Rollback()
-		return tx.Error
+		return err
 	}
 
 	return nil
@@ -138,8 +145,13 @@ func (LikeDao) UnLikeVideo(likedInfo bo.VideoLikedBo) error {
 
 	//用户若有获赞数量，则根据video author查用户表，再在获赞数量字段-1
 	//video中favorite_count字段-1
+	err := GroupApp.VideoDao.VideoFavoriteCountIncr(likedInfo.VideoId, -1)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-	if err := tx.Commit().Error; err != nil {
+	if err = tx.Commit().Error; err != nil {
 		tx.Rollback()
 		return tx.Error
 	}

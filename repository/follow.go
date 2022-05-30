@@ -150,27 +150,14 @@ func (FollowDao) FollowUser(followInfo bo.FollowBo) error {
 	}
 
 	// 进行关注
-	// 1. 之前关注过被软删除
-	if result.RowsAffected == 1 && follow.DeletedAt.Valid {
-		err := tx.Debug().Unscoped().Model(&model.Follow{}).
-			Where("user_id = ? AND to_user_id = ?", followInfo.UserId, followInfo.ToUserId).
-			Update("deleted_at", nil).Error
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
+	err := tx.Debug().Create(&model.Follow{UserId: followInfo.UserId, ToUserId: followInfo.ToUserId}).Error
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 
-	// 2. 之前没关注过
-	if result.RowsAffected == 0 {
-		err := tx.Debug().Create(model.Follow{UserId: followInfo.UserId, ToUserId: followInfo.ToUserId}).Error
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	err := updateFollowAndFollowerCount(tx, followInfo.UserId, followInfo.ToUserId, 1)
+	// 更新关注和粉丝数
+	err = updateFollowAndFollowerCount(tx, followInfo.UserId, followInfo.ToUserId, 1)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -226,7 +213,7 @@ func (FollowDao) FollowUserByRedis(followInfo bo.FollowBo) error {
 
 	// 写入数据库
 	tx := global.GVA_DB.Begin()
-	err := tx.Debug().Create(model.Follow{UserId: userIdInt, ToUserId: toUserIdInt}).Error
+	err := tx.Debug().Create(&model.Follow{UserId: userIdInt, ToUserId: toUserIdInt}).Error
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -263,7 +250,6 @@ func (FollowDao) FollowUserByRedis(followInfo bo.FollowBo) error {
 
 // UnFollowUser delete row from t_follow
 // 如果在已经关注的情况下，存在deleted_at。则先删除deleted_at条目，再将最新的关注标记为”软删除“。已达到更新软删除的目的
-// 漏洞：如果在未关注情况下，连续调用两次这个方法，那么会将最后一个软删除删掉
 func (FollowDao) UnFollowUser(followInfo bo.FollowBo) error {
 	// 1. 前置判断
 	var follow model.Follow
@@ -299,12 +285,6 @@ func (FollowDao) UnFollowUser(followInfo bo.FollowBo) error {
 		tx.Rollback()
 		return err
 	}
-	//global.GVA_DB.Unscoped().Where("user_id = ? and to_user_id = ? and deleted_at IS NOT NULL", followInfo.UserId, followInfo.ToUserId).Delete(&follow)
-
-	// 2. 取消关注
-	//if err := unFollowUser(followInfo); err != nil {
-	//	return err
-	//}
 
 	return nil
 }

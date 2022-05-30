@@ -3,9 +3,9 @@ package api
 import (
 	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
+	"bytedance-douyin/exceptions"
 	"bytedance-douyin/service/bo"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 /**
@@ -30,26 +30,36 @@ func (api *CommentApi) CommentOPS(c *gin.Context) {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
+
+	tokenId, ok := c.Get("tokenId")
+	if !ok {
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+	request.UserId = tokenId.(int64)
+
 	var err error
 	var comment vo.Comment
+
 	data := vo.CommentActionResponseVo{}
-	if request.ActionType == POST {
-		// 添加评论
+
+	switch request.ActionType {
+	case POST:
 		commentPost := bo.CommentPost{UserId: request.UserId, VideoId: request.VideoId, CommentText: request.CommentText}
 		comment, err = commentService.PostComment(commentPost)
-
-	} else if request.ActionType == DELETE {
-		// 删除评论
+	case DELETE:
 		commentDelete := bo.CommentDelete{UserId: request.UserId, VideoId: request.VideoId, CommentId: request.CommentId}
 		err = commentService.DeleteComment(commentDelete)
 	}
+
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
 	}
 	// 添加评论返回评论信息
 	if request.ActionType == POST {
-		info, err := userService.GetUserInfo(vo.UserInfoVo{UserId: request.UserId, MyUserId: request.UserId})
+		var info bo.UserInfoBo
+		info, err = userService.GetUserInfo(vo.UserInfoVo{UserId: request.UserId, MyUserId: request.UserId})
 		if err != nil {
 			response.FailWithMessage(c, err.Error())
 			return
@@ -66,9 +76,14 @@ func (api *CommentApi) CommentOPS(c *gin.Context) {
 }
 
 func (api *CommentApi) CommentList(c *gin.Context) {
-	videoId, _ := strconv.Atoi(c.Query("video_id"))
-	userId, _ := strconv.Atoi(c.Query("user_id"))
-	list, err := commentService.GetCommentList(int64(userId), int64(videoId))
+	var request vo.CommentListRequest
+
+	if err := c.ShouldBind(&request); err != nil {
+		response.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+
+	list, err := commentService.GetCommentList(request.UserId, request.VideoId)
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
 		return

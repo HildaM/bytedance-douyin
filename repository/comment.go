@@ -34,8 +34,17 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 			ID: CommentId,
 		},
 	}
-	if result := global.GVA_DB.Delete(&comment); result.Error != nil {
+	tx := global.GVA_DB.Begin()
+
+	if result := tx.Debug().Delete(&comment); result.Error != nil {
 		return result.Error
+	}
+
+	videoId := comment.VideoId
+	err := GroupApp.VideoDao.VideoCommentCountIncr(videoId, -1)
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 	return nil
 }
@@ -47,8 +56,23 @@ func (CommentDao) PostComment(post bo.CommentPost) (model.Comment, error) {
 		UserId:  post.UserId,
 		Content: post.CommentText,
 	}
-	if result := global.GVA_DB.Create(&comment); result.Error != nil {
+	tx := global.GVA_DB.Begin()
+
+	if result := tx.Debug().Create(&comment); result.Error != nil {
+		tx.Rollback()
 		return comment, result.Error
 	}
+
+	err := GroupApp.VideoDao.VideoCommentCountIncr(post.VideoId, 1)
+	if err != nil {
+		tx.Rollback()
+		return comment, err
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return comment, err
+	}
+
 	return comment, nil
 }
