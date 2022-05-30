@@ -24,5 +24,7 @@
 持久化层到客户端的数据封装。由于部分业务简单，灵活变通吧。
 大多数情况下vo、bo、model其实都长得差不多，可以通过json的tag屏蔽掉一些敏感信息。
 
-vo -> bo -> dao
+vo -> bo -> dao\
 vo <- bo <- dao
+\
+如果初次下拉本仓库，请参照resource文件夹中config-demo.yaml创建自己的配置文件config.yaml
