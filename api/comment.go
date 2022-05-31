@@ -64,7 +64,8 @@ func (api *CommentApi) CommentOPS(c *gin.Context) {
 			response.FailWithMessage(c, err.Error())
 			return
 		}
-		comment.User = vo.UserInfo{Id: info.Id,
+		comment.User = vo.UserInfo{
+			Id:            info.Id,
 			Name:          info.Name,
 			FollowCount:   info.FollowCount,
 			FollowerCount: info.FollowerCount,

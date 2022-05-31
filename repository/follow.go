@@ -44,7 +44,7 @@ func (FollowDao) GetFollowList(userId int64) (vo.FollowResponseVo, error) {
 }
 
 // GetFollowListByRedis use redis to refactor 获取用户的关注列表中的用户信息
-func (FollowDao) GetFollowListByRedis(userId int64) (vo.FollowResponseVo, error) {
+func (f FollowDao) GetFollowListByRedis(userId int64) (vo.FollowResponseVo, error) {
 	var followList vo.FollowResponseVo
 
 	userKey := FOLLOW_SET_KEY + strconv.FormatInt(userId, 10)
@@ -56,6 +56,26 @@ func (FollowDao) GetFollowListByRedis(userId int64) (vo.FollowResponseVo, error)
 	if res.Err() != nil {
 		return followList, res.Err()
 	}
+
+	// 缓存失效
+	if len(res.Val()) == 0 {
+		list, err := f.GetFollowList(userId)
+		if err != nil {
+			return followList, err
+		}
+		// 异步执行
+		go func() {
+			err := updateUserListToRedis(list.UserList, userKey)
+			if err != nil {
+				global.GVA_LOG.Error(exceptions.UpdateRedisFailureError.Error())
+				global.GVA_LOG.Error(err.Error())
+			}
+		}()
+
+		return list, nil
+	}
+
+	// 缓存击中
 	followerIds := utils.String2Int64(res.Val())
 
 	// 2. 获取关注者
@@ -79,6 +99,23 @@ func (FollowDao) GetFollowListByRedis(userId int64) (vo.FollowResponseVo, error)
 
 	followList.UserList = follows
 	return followList, nil
+}
+
+// updateUserListToRedis 异步地将数据更新到redis服务器中
+func updateUserListToRedis(list []vo.UserInfo, userKey string) error {
+	ids := make([]int64, len(list))
+
+	for i, u := range list {
+		ids[i] = u.Id
+	}
+
+	rdb := global.GVA_REDIS
+	res := rdb.SAdd(context.Background(), userKey, ids)
+	if res.Err() != nil {
+		return res.Err()
+	}
+
+	return nil
 }
 
 // GetToUserIdList use userId to find to_user_id list 获取用户关注用户的id
@@ -115,11 +152,17 @@ func (f FollowDao) GetToUserIdListByRedis(userId int64) ([]int64, error) {
 		if err != nil {
 			return nil, err
 		}
-		r := rdb.SAdd(ctx, userKey, list)
-		if r.Err() != nil {
-			return nil, r.Err()
-		}
 		toUserList = list
+
+		// 异步更新数据
+		go func() {
+			r := rdb.SAdd(ctx, userKey, list)
+			if r.Err() != nil {
+				global.GVA_LOG.Error(exceptions.UpdateRedisFailureError.Error())
+				global.GVA_LOG.Error(r.Err().Error())
+			}
+		}()
+
 	} else {
 		toUserList = utils.String2Int64(res.Val())
 	}
@@ -403,7 +446,7 @@ func (FollowDao) GetFanList(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, 
 
 // GetFanListByRedis 获取粉丝列表
 // 由于redis中存储的是用户的id，所以获取到id集合后，还需要用id在数据库中查找对应的用户
-func (FollowDao) GetFanListByRedis(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
+func (f FollowDao) GetFanListByRedis(userInfo vo.FollowerListVo) (vo.FollowerResponseVo, error) {
 	rdb := global.GVA_REDIS
 	ctx := context.Background()
 	var fansList vo.FollowerResponseVo
@@ -420,6 +463,26 @@ func (FollowDao) GetFanListByRedis(userInfo vo.FollowerListVo) (vo.FollowerRespo
 		return fansList, result.Err()
 	}
 
+	// 缓存失效处理
+	if len(result.Val()) == 0 {
+		list, err := f.GetFanList(userInfo)
+		if err != nil {
+			return fansList, err
+		}
+
+		// 异步更新
+		go func() {
+			err := updateUserListToRedis(list.UserList, followerKey)
+			if err != nil {
+				global.GVA_LOG.Error(exceptions.UpdateRedisFailureError.Error())
+				global.GVA_LOG.Error(err.Error())
+			}
+		}()
+
+		return list, nil
+	}
+
+	// 缓存击中
 	fansIds := utils.String2Int64(result.Val())
 	userFans, err := GroupApp.UserDao.GetUsers(fansIds)
 	if err != nil {
