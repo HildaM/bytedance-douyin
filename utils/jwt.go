@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/global"
 	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	jsoniter "github.com/json-iterator/go"
 	"time"
@@ -84,7 +86,7 @@ func (j JWT) ParseTokenRedis(token string) (*vo.CustomClaims, error) {
 	r, err := global.GVA_REDIS.Get(context.Background(), token).Result()
 	if err == nil {
 		var cc vo.CustomClaims
-		err := jsoniter.Unmarshal([]byte(r), &cc)
+		err = jsoniter.Unmarshal([]byte(r), &cc)
 		if err != nil {
 			return nil, err
 		}
@@ -110,4 +112,19 @@ func GenerateAndSaveToken(claims vo.BaseClaims) (string, error) {
 		return "", err
 	}
 	return token, nil
+}
+
+func (j JWT) CheckTokenWithoutLogin(c *gin.Context) (int64, error) {
+	token := c.Query("token")
+	tokenId := int64(0)
+	// 登录了
+	if token != "" {
+		claims, err := j.ParseTokenRedis(token)
+		if err != nil {
+			response.FailWithMessage(c, err.Error())
+			return tokenId, err
+		}
+		tokenId = claims.BaseClaims.Id
+	}
+	return tokenId, nil
 }

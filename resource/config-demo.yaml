@@ -10,14 +10,11 @@ zap:
   log-in-console: true
 
 file:
-  video-output: /home/files/videos/
-  image-output: /home/files/images/
-#  jtan's local test directory
-#  video-output: C:\Users\jtan\Desktop\douyin-backend\
-#  image-output: C:\Users\jtan\Desktop\douyin-backend\
+  video-output: your video path
+  image-output: your image path
 
 redis:
-  addr: ''
+  addr: '127.0.0.1'
   port: '6379'
   password: ''
   db: '0'
@@ -25,11 +22,11 @@ redis:
 
 
 mysql:
-  path: ''
+  path: '127.0.0.1'
   port: '3306'
-  config: 'charset=utf8mb4&parseTime=True'
+  config: ''
   db-name: ''
-  username: ''
+  username: 'root'
   password: ''
   max-idle-conns: 10
   max-open-conns: 100
@@ -38,5 +35,5 @@ mysql:
 
 jwt:
   signing-key: ''
-  expires-time: 604800
+  expires-time: 10
   issuer: ''

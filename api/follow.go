@@ -4,6 +4,7 @@ import (
 	r "bytedance-douyin/api/response"
 	"bytedance-douyin/api/vo"
 	"bytedance-douyin/exceptions"
+	"bytedance-douyin/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,13 +17,21 @@ import (
  */
 type FollowApi struct{}
 
-// Follow 关注或取消关注
+// Follow 关注或取消关注，登录才能关注
 func (api *FollowApi) Follow(c *gin.Context) {
 	var followInfo vo.FollowVo
 	if err := c.ShouldBind(&followInfo); err != nil {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
+
+	// 登录才能关注，此时已经经过鉴权，可以直接拿tokenId
+	tokenId, ok := c.Get("tokenId")
+	if !ok {
+		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+		return
+	}
+	followInfo.UserId = tokenId.(int64)
 
 	var err error
 	var code int8
@@ -40,14 +49,7 @@ func (api *FollowApi) Follow(c *gin.Context) {
 	r.OkWithMessage(c, action+"成功")
 }
 
-//
-//  FollowList
-//  @Description:	获取关注列表
-//  @receiver api
-//  @param c
-//	@Request body:	user_id, token
-// 	@Author Quan
-//
+// FollowList 获取关注列表
 func (api *FollowApi) FollowList(c *gin.Context) {
 	var userInfo vo.FollowListVo
 	if err := c.ShouldBind(&userInfo); err != nil {
@@ -63,8 +65,7 @@ func (api *FollowApi) FollowList(c *gin.Context) {
 	r.OkWithData(c, userList)
 }
 
-//
-//  FansList
+// FansList
 //  @Description: 	获取粉丝列表
 //  @receiver api
 //	@Request body:	user_id, token
@@ -76,12 +77,15 @@ func (api *FollowApi) FansList(c *gin.Context) {
 		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
 		return
 	}
-	tokenId, ok := c.Get("tokenId")
-	if !ok {
-		r.FailWithMessage(c, exceptions.ParamValidationError.Error())
+
+	// 未登录也可以获取他人粉丝列表
+	j := utils.NewJWT()
+	tokenId, err := j.CheckTokenWithoutLogin(c)
+	if err != nil {
+		r.FailWithMessage(c, err.Error())
 		return
 	}
-	userInfo.TokenId = tokenId.(int64)
+	userInfo.TokenId = tokenId
 
 	fanList, err := followerService.GetFanList(userInfo)
 	if err != nil {

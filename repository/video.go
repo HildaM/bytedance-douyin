@@ -9,6 +9,7 @@ import (
 	"bytedance-douyin/repository/model"
 	"bytedance-douyin/service/bo"
 	"gorm.io/gorm"
+	"time"
 )
 
 type VideoDao struct{}
@@ -69,7 +70,8 @@ func (VideoDao) GetVideoListByTime(t int64) ([]model.Video, error) {
 	// 查询出最新的30个视频
 	err := global.GVA_DB.Model(&model.Video{}).Preload("Author", func(db *gorm.DB) *gorm.DB {
 		return db.Table(model.UserDao{}.TableName())
-	}).Where("created_at <= FROM_UNIXTIME(?)", t).Order("created_at desc").
+	}).Where("created_at <= ?", time.UnixMilli(t).Format("2006-01-02 15:04:05")).
+		Order("created_at desc").
 		Limit(30).
 		Find(&videos).Error
 	if err != nil {
@@ -77,4 +79,24 @@ func (VideoDao) GetVideoListByTime(t int64) ([]model.Video, error) {
 	}
 
 	return videos, nil
+}
+
+func (VideoDao) VideoFavoriteCountIncr(videoId int64, incr int) error {
+	var video model.Video
+
+	err := global.GVA_DB.Model(&video).Where("id = ?", videoId).UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", incr)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (VideoDao) VideoCommentCountIncr(videoId int64, incr int) error {
+	var video model.Video
+
+	err := global.GVA_DB.Model(&video).Where("id = ?", videoId).UpdateColumn("comment_count", gorm.Expr("comment_count + ?", incr)).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytedance-douyin/api/vo"
-	"bytedance-douyin/global"
 	"bytedance-douyin/service/bo"
 )
 
@@ -34,7 +33,7 @@ func (LikeService) GetLikeList(likeListInfo vo.FavoriteListVo) (vo.FavoriteRespo
 	//	}
 	//	// 获取is_follow
 	//	isFollow := true
-	//	count, err := followDao.GetFollowCount(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
+	//	count, err := followDao.GetIsFollow(bo.FollowBo{UserId: userId, ToUserId: video.AuthorId})
 	//	if err != nil {
 	//		return favoriteVideoList, err
 	//	}
@@ -79,7 +78,6 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 	case count != 0 && action == 1:
 		// 点过赞还点
 		// 可不处理
-		// TODO: 可能之前取消过点赞
 	case count == 0 && action == 1:
 		// 没点过赞点赞
 		err = likeDao.LikeVideo(videoLikedBo)
@@ -88,7 +86,7 @@ func (LikeService) LikeOrCancel(likeInfo vo.FavoriteActionVo) (int8, error) {
 		err = likeDao.UnLikeVideo(videoLikedBo)
 	}
 	if err != nil {
-		global.GVA_LOG.Error(err.Error())
+		//global.GVA_LOG.Error(err.Error())
 		return 0, err
 	}
 

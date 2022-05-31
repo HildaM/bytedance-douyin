@@ -19,4 +19,4 @@
 
 log
 
-resource/*.yaml
+resource/config.yaml

@@ -48,7 +48,7 @@ func (VideoService) GetVideoList(userId, myId int64) ([]vo.Video, error) {
 	//		return
 	//	}
 	//
-	//	count, followErr = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
+	//	count, followErr = GroupApp.FollowService.GetIsFollow(vo.FollowVo{UserId: myId, ToUserId: userId})
 	//	if count != 0 {
 	//		isFollow = true
 	//	}
@@ -90,7 +90,6 @@ func (VideoService) GetVideoList(userId, myId int64) ([]vo.Video, error) {
 
 // GetVideoFeed 获取视频流，并查询follow及favorite更新is_follow字段
 func (VideoService) GetVideoFeed(userId, t int64) ([]vo.Video, error) {
-
 	videos, err := videoDao.GetVideoListByTime(t)
 	if err != nil {
 		return nil, err
@@ -193,7 +192,8 @@ func handleFollowCondition(videos []model.Video, userId int64) ([]vo.Video, erro
 	followUserMap := make(map[int64]bool, len(toUserIdList))
 	followVideoMap := make(map[int64]bool, len(toVideoIdList))
 	// 没有登录或是自己的
-	isLogin := userId != -1
+	isLogin := userId != 0
+
 	if !isLogin {
 		// 全部赋值为false
 		for _, uId := range toUserIdList {
@@ -208,7 +208,8 @@ func handleFollowCondition(videos []model.Video, userId int64) ([]vo.Video, erro
 		// 查询用户是否关注
 		go func() {
 			defer wg.Done()
-			followUserMap, err1 = followDao.GetFollowUserIdByUserId(userId, toUserIdList)
+			//followUserMap, err1 = followDao.GetFollowUserIdByUserId(userId, toUserIdList)
+			followUserMap, err1 = followDao.GetFollowUserIdByUserIdByRedis(userId, toUserIdList)
 		}()
 
 		// 查询视频是否点赞

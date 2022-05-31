@@ -45,10 +45,10 @@ func (UserService) GetUserInfo(userInfo vo.UserInfoVo) (bo.UserInfoBo, error) {
 		}
 
 		// use follow service judge whether I followed him
-		var count int64
-		count, err2 = GroupApp.FollowService.GetFollowCount(vo.FollowVo{UserId: myId, ToUserId: userId})
-		if count != 0 {
-			userInfoBo.Follow = true
+		var isFollow bool
+		isFollow, err2 = GroupApp.FollowService.GetIsFollow(vo.FollowVo{UserId: myId, ToUserId: userId})
+		if isFollow {
+			userInfoBo.Follow = isFollow
 		}
 	}()
 

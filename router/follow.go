@@ -14,14 +14,14 @@ import (
  */
 type FollowRouter struct{}
 
-func (c *FollowRouter) InitFollowRouter(Router *gin.RouterGroup) {
-	baseRouter := Router.Group("relation")
+func (c *FollowRouter) InitFollowRouter(baseRouter *gin.RouterGroup) {
+	//baseRouter := Router.Group("relation")
 	followRouter := baseRouter.Group("follow")
 	followerRouter := baseRouter.Group("follower")
 	followApi := api.GroupApp.FollowApi
 	{
 		// /relation/action
-		baseRouter.POST("action/", followApi.Follow)
+		//baseRouter.POST("action/", followApi.Follow)
 		// /relation/follow/list
 		followRouter.GET("list/", followApi.FollowList)
 	}
@@ -29,4 +29,9 @@ func (c *FollowRouter) InitFollowRouter(Router *gin.RouterGroup) {
 		// /relation/follower/list
 		followerRouter.GET("list/", followApi.FansList)
 	}
+	//return baseRouter
+}
+
+func (c *FollowRouter) InitRelationRouter(Router *gin.RouterGroup) *gin.RouterGroup {
+	return Router.Group("relation")
 }

@@ -16,16 +16,16 @@ import (
  */
 type CommentDao struct{}
 
-func (CommentDao) GetCommentList(videoId int64) (*[]bo.Comment, error) {
-	comments := make([]bo.Comment, 0)
-	result := global.GVA_DB.Model(&model.Comment{}).Preload("User", func(db *gorm.DB) *gorm.DB {
+func (CommentDao) GetCommentList(videoId int64) ([]model.Comment, error) {
+	comments := make([]model.Comment, 0)
+	result := global.GVA_DB.Preload("User", func(db *gorm.DB) *gorm.DB {
 		return db.Table(model.UserDao{}.TableName())
 	}).Where("video_id = ?", videoId).Find(&comments)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &comments, nil
+	return comments, nil
 }
 
 func (CommentDao) DeleteComment(CommentId int64) error {
@@ -34,20 +34,45 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 			ID: CommentId,
 		},
 	}
-	if result := global.GVA_DB.Delete(&comment); result.Error != nil {
+	tx := global.GVA_DB.Begin()
+
+	if result := tx.Debug().Delete(&comment); result.Error != nil {
 		return result.Error
+	}
+
+	videoId := comment.VideoId
+	err := GroupApp.VideoDao.VideoCommentCountIncr(videoId, -1)
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 	return nil
 }
 
-func (CommentDao) PostComment(post bo.CommentPost) error {
-	comment := model.Comment{
+func (CommentDao) PostComment(post bo.CommentPost) (model.Comment, error) {
+	var comment model.Comment
+	comment = model.Comment{
 		VideoId: post.VideoId,
 		UserId:  post.UserId,
 		Content: post.CommentText,
 	}
-	if result := global.GVA_DB.Create(&comment); result.Error != nil {
-		return result.Error
+	tx := global.GVA_DB.Begin()
+
+	if result := tx.Debug().Create(&comment); result.Error != nil {
+		tx.Rollback()
+		return comment, result.Error
 	}
-	return nil
+
+	err := GroupApp.VideoDao.VideoCommentCountIncr(post.VideoId, 1)
+	if err != nil {
+		tx.Rollback()
+		return comment, err
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return comment, err
+	}
+
+	return comment, nil
 }
