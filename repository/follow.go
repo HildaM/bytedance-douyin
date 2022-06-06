@@ -103,10 +103,10 @@ func (f FollowDao) GetFollowListByRedis(userId int64) (vo.FollowResponseVo, erro
 
 // updateUserListToRedis 异步地将数据更新到redis服务器中
 func updateUserListToRedis(list []vo.UserInfo, userKey string) error {
-	ids := make([]int64, len(list))
+	ids := make([]string, len(list))
 
 	for i, u := range list {
-		ids[i] = u.Id
+		ids[i] = strconv.FormatInt(u.Id, 10)
 	}
 
 	rdb := global.GVA_REDIS
