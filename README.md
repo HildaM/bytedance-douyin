@@ -27,4 +27,8 @@
 vo -> bo -> dao\
 vo <- bo <- dao
 \
-如果初次下拉本仓库，请参照resource文件夹中config-demo.yaml创建自己的配置文件config.yaml
+如果初次下拉本仓库，请参照resource文件夹中config_sample.yaml创建自己的配置文件config.yaml
+## 部署流程
+1. 修改config.yaml文件及Dockerfile文件中21及22行，文件夹位置，使其保持同步
+2. 执行`docker build -t {imageName}:{tag} .`
+3. 等待执行结束后执行`docker run -d -p 8080:8080 --name yourName -t {imageName}:{tag}`
