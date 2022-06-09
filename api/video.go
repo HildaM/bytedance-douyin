@@ -63,7 +63,11 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 	}
 
 	// 读取视频文件的第一帧作为视频封面
-	reader := utils.ReadFrameAsJpeg(fn)
+	reader, err := utils.ReadFrameAsJpeg(fn)
+	if err != nil {
+		response.FailWithMessage(c, err.Error())
+		return
+	}
 	img, err := imaging.Decode(reader)
 	if err != nil {
 		response.FailWithMessage(c, err.Error())

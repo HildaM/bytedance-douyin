@@ -11,7 +11,7 @@ import (
 )
 
 // ReadFrameAsJpeg use ffmpeg read first frame of video as a jpeg
-func ReadFrameAsJpeg(inFileName string) io.Reader {
+func ReadFrameAsJpeg(inFileName string) (io.Reader, error) {
 	frameNum := 1
 	buf := bytes.NewBuffer(nil)
 	err := ffmpeg.Input(inFileName).
@@ -20,9 +20,9 @@ func ReadFrameAsJpeg(inFileName string) io.Reader {
 		WithOutput(buf, os.Stdout).
 		Run()
 	if err != nil {
-		panic(err)
+		return buf, err
 	}
-	return buf
+	return buf, nil
 }
 
 // GenerateFilename depend on timestamp, username and user id to generate a filename for uploaded videos
