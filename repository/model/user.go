@@ -10,7 +10,7 @@ package model
 type UserDao struct {
 	Base
 	Name          string `gorm:"type:varchar(32)"`
-	Password      string `gorm:"type:varchar(32)"`
+	Password      string `gorm:"type:char(64)"`
 	FollowCount   int64
 	FollowerCount int64
 }
