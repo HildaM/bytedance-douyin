@@ -17,12 +17,13 @@ type CommentService struct{}
 
 // GetCommentList 获取评论列表
 func (CommentService) GetCommentList(userId, videoId int64) ([]vo.Comment, error) {
+	// 获取视频的评论
 	list, err := commentDao.GetCommentList(videoId)
 	if err != nil {
 		return nil, err
 	}
 
-	// 获取评论用户的id
+	// 获取当前用户关注的评论用户的id
 	followList, _ := followDao.GetToUserIdListByRedis(userId)
 	followMap := make(map[int64]bool, len(followList))
 	for _, v := range followList {
