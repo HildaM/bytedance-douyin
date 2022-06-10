@@ -12,3 +12,12 @@ func String2Int64(strArr []string) []int64 {
 
 	return int64Arr
 }
+
+func Int64ToString(arr []int64) []string {
+	stringArr := make([]string, len(arr))
+
+	for i, val := range arr {
+		stringArr[i] = strconv.FormatInt(val, 10)
+	}
+	return stringArr
+}

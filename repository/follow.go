@@ -154,14 +154,16 @@ func (f FollowDao) GetToUserIdListByRedis(userId int64) ([]int64, error) {
 		}
 		toUserList = list
 
-		// 异步更新数据
-		go func() {
-			r := rdb.SAdd(ctx, userKey, list)
-			if r.Err() != nil {
-				global.GVA_LOG.Error(exceptions.UpdateRedisFailureError.Error())
-				global.GVA_LOG.Error(r.Err().Error())
-			}
-		}()
+		if len(list) != 0 {
+			// 异步更新数据
+			go func() {
+				r := rdb.SAdd(ctx, userKey, utils.Int64ToString(list))
+				if r.Err() != nil {
+					global.GVA_LOG.Error(exceptions.UpdateRedisFailureError.Error())
+					global.GVA_LOG.Error(r.Err().Error())
+				}
+			}()
+		}
 
 	} else {
 		toUserList = utils.String2Int64(res.Val())
