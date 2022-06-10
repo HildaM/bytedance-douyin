@@ -339,11 +339,11 @@ func (FollowDao) UnFollowUserByRedis(followInfo bo.FollowBo) error {
 
 	userId := strconv.FormatInt(followInfo.UserId, 10)
 	toUserId := strconv.FormatInt(followInfo.ToUserId, 10)
-	followerKey := FAN_SET_KEY + toUserId
-	followKey := FOLLOW_SET_KEY + userId
+	followerKey := FAN_SET_KEY + toUserId // to的粉丝
+	followKey := FOLLOW_SET_KEY + userId  // 我的关注
 
-	// 1. 前置判断
-	result := rdb.SIsMember(ctx, followerKey, toUserId)
+	// 1. 前置判断，是否已关注
+	result := rdb.SIsMember(ctx, followKey, toUserId)
 	if result.Err() != nil {
 		return result.Err()
 	}
