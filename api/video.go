@@ -105,18 +105,6 @@ func (api *VideoApi) PostVideo(c *gin.Context) {
 // VideoFeed 视频流接口
 func (api *VideoApi) VideoFeed(c *gin.Context) {
 	// 这个接口没有经过鉴权，所以要解析token
-	//token := c.Query("token")
-	//tokenId := int64(0)
-	//// 登录了
-	//if token != "" {
-	//	j := utils.NewJWT()
-	//	claims, err := j.ParseTokenRedis(token)
-	//	if err != nil {
-	//		response.FailWithMessage(c, err.Error())
-	//		return
-	//	}
-	//	tokenId = claims.BaseClaims.Id
-	//}
 	j := utils.NewJWT()
 	tokenId, err := j.CheckTokenWithoutLogin(c)
 	if err != nil {
@@ -148,7 +136,7 @@ func (api *VideoApi) VideoFeed(c *gin.Context) {
 		nextTime := videos[len(videos)-1].CreatedAt.UnixMilli()
 		data.NextTime = nextTime
 	}
-	fmt.Println(data)
+
 	response.OkWithData(c, data)
 }
 

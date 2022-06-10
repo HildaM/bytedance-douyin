@@ -34,11 +34,14 @@ func RunWindowsServer() {
 	Router.StaticFS("/images", http.Dir(global.GVA_CONFIG.File.ImageOutput))
 
 	// address := fmt.Sprintf(":%d", global.GVA_CONFIG.System.Addr)
-	s := initServer("0.0.0.0:8080", Router)
+	port := global.GVA_CONFIG.Port
+	ip := global.GVA_CONFIG.IP
+	s := initServer("0.0.0.0:"+port, Router)
+
 	// 保证文本顺序输出
 	// In order to ensure that the text order output can be deleted
 	time.Sleep(10 * time.Microsecond)
-	global.GVA_LOG.Info("server run success on ", zap.String("address", "127.0.0.1"))
+	global.GVA_LOG.Info("server run success on ", zap.String("address", ip))
 
 	global.GVA_LOG.Error(s.ListenAndServe().Error())
 

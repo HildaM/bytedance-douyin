@@ -9,9 +9,11 @@ package config
  */
 
 type Server struct {
-	Zap   Zap   `mapstructure:"zap" json:"zap" yaml:"zap"`
-	File  File  `mapstructure:"file" json:"file" yaml:"file"`
-	Redis Redis `mapstructure:"redis" json:"redis" yaml:"redis"`
-	Mysql Mysql `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
-	JWT   JWT   `mapstructure:"jwt" json:"jwt" yaml:"jwt"`
+	Zap   Zap    `mapstructure:"zap" json:"zap" yaml:"zap"`
+	File  File   `mapstructure:"file" json:"file" yaml:"file"`
+	Redis Redis  `mapstructure:"redis" json:"redis" yaml:"redis"`
+	Mysql Mysql  `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
+	JWT   JWT    `mapstructure:"jwt" json:"jwt" yaml:"jwt"`
+	IP    string `mapstructure:"ip" json:"ip" yaml:"ip"`
+	Port  string `mapstructure:"port" json:"port" yaml:"port"`
 }

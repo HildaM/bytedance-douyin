@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytedance-douyin/global"
 	"bytes"
 	"fmt"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -29,4 +30,16 @@ func ReadFrameAsJpeg(inFileName string) (io.Reader, error) {
 func GenerateFilename(username string, userId int64) string {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	return timestamp + "_" + username + "_" + strconv.FormatInt(userId, 10)
+}
+
+func getUrlPrefix() string {
+	return "http://" + global.GVA_CONFIG.IP + ":" + global.GVA_CONFIG.Port + "/"
+}
+
+func GetVideoUrl() string {
+	return getUrlPrefix() + "videos/"
+}
+
+func GetImageUrl() string {
+	return getUrlPrefix() + "images/"
 }

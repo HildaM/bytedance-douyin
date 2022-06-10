@@ -37,3 +37,6 @@ jwt:
   signing-key: '123456'
   expires-time: 604800
   issuer: '123456'
+
+ip: 127.0.0.1  # 请修改为自己主机或宿主机ip
+port: 8080
