@@ -28,7 +28,7 @@ func (CommentDao) GetCommentList(videoId int64) ([]model.Comment, error) {
 	return comments, nil
 }
 
-func (CommentDao) DeleteComment(CommentId int64) error {
+func (CommentDao) DeleteComment(CommentId, videoId int64) error {
 	comment := model.Comment{
 		Base: model.Base{
 			ID: CommentId,
@@ -41,7 +41,6 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 		return result.Error
 	}
 
-	videoId := comment.VideoId
 	err := GroupApp.VideoDao.VideoCommentCountIncr(videoId, -1)
 	if err != nil {
 		tx.Rollback()

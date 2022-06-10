@@ -51,7 +51,7 @@ func (CommentService) GetCommentList(userId, videoId int64) ([]vo.Comment, error
 
 // DeleteComment 删除评论
 func (s CommentService) DeleteComment(commentDelete bo.CommentDelete) error {
-	if err := commentDao.DeleteComment(commentDelete.CommentId); err != nil {
+	if err := commentDao.DeleteComment(commentDelete.CommentId, commentDelete.VideoId); err != nil {
 		return err
 	}
 	return nil
