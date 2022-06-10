@@ -13,8 +13,8 @@ type CommentActionRequest struct {
 
 // CommentListRequest 评论列表
 type CommentListRequest struct {
-	UserId  int64 `form:"user_id" binding:"required"`
-	VideoId int64 `form:"video_id" binding:"required"`
+	Token   string `form:"token"`
+	VideoId int64  `form:"video_id" binding:"required"`
 }
 
 type Comment struct {

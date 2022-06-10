@@ -19,6 +19,6 @@ func (c *CommentRouter) InitCommentRouter(Router *gin.RouterGroup) {
 	commentApi := api.GroupApp.CommentApi
 	{
 		router.POST("action/", commentApi.CommentOPS)
-		router.GET("list", commentApi.CommentList)
+		router.GET("list/", commentApi.CommentList)
 	}
 }

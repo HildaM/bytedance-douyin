@@ -84,7 +84,12 @@ func (api *CommentApi) CommentList(c *gin.Context) {
 		return
 	}
 
-	list, err := commentService.GetCommentList(request.UserId, request.VideoId)
+	userId, ok := c.Get("tokenId")
+	if !ok {
+		userId = 0
+	}
+
+	list, err := commentService.GetCommentList(userId.(int64), request.VideoId)
 	if err != nil {
 		response.FailWithMessage(c, err.Error())
 		return
