@@ -37,6 +37,7 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 	tx := global.GVA_DB.Begin()
 
 	if result := tx.Debug().Delete(&comment); result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
 
@@ -46,6 +47,12 @@ func (CommentDao) DeleteComment(CommentId int64) error {
 		tx.Rollback()
 		return err
 	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return nil
 }
 
